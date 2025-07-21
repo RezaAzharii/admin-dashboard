@@ -7,7 +7,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { FaPlus } from "react-icons/fa";
 import clsx from "clsx";
 import { useRef, useState } from "react";
 
@@ -16,7 +15,7 @@ import { CollapsibleSearch } from "components/shared/CollapsibleSearch";
 import { TableSortIcon } from "components/shared/table/TableSortIcon";
 import { PaginationSection } from "components/shared/table/PaginationSection";
 import { SelectedRowsActions } from "components/shared/table/SelectedRowsActions";
-import { Card, Table, THead, TBody, Th, Tr, Td, Button } from "components/ui";
+import { Card, Table, THead, TBody, Th, Tr, Td } from "components/ui";
 import { useBoxSize, useDidUpdate } from "hooks";
 import { fuzzyFilter } from "utils/react-table/fuzzyFilter";
 import { useSkipper } from "utils/react-table/useSkipper";
@@ -110,9 +109,6 @@ export function AppointmentsTable() {
             value={globalFilter ?? ""}
             onChange={(e) => setGlobalFilter(e.target.value)}
           />
-          <Button variant="flat" className="size-7 rounded-full" isIcon>
-            <FaPlus className="size-2" />
-          </Button>
           <MenuAction />
         </div>
       </div>
