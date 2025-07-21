@@ -10,6 +10,7 @@ import { useDidUpdate } from "hooks";
 import { isRouteActive } from "utils/isRouteActive";
 // import { MainPanel } from "./MainPanel";
 import { PrimePanel } from "./PrimePanel";
+// import { MainPanel } from "./MainPanel";
 
 // ----------------------------------------------------------------------
 
@@ -54,6 +55,9 @@ export function Sidebar() {
         setActiveSegment={setActiveSegmentPath}
       /> */}
       <PrimePanel
+        nav={navigation}
+        activeSegment={activeSegmentPath}
+        setActiveSegment={setActiveSegmentPath}
         close={close}
         currentSegment={currentSegment}
         pathname={pathname}

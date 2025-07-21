@@ -6,7 +6,7 @@ import {
   SelectCell,
   SelectHeader,
 } from "components/shared/table/SelectCheckbox";
-import { EmailCell, NameCell, PasarCell } from "./rows";
+import { EmailCell, NameCell} from "./rows";
 import { RowActions } from "./RowActions";
 
 // ----------------------------------------------------------------------
@@ -29,16 +29,6 @@ export const columns = [
     header: "email",
     cell: EmailCell,
   }),
-  columnHelper.accessor((row) => row.pasar, {
-    id: "pasar",
-    header: "pasar",
-    cell: PasarCell,
-  }),
-  //   columnHelper.accessor((row) => row.status, {
-  //     id: "status",
-  //     header: "status",
-  //     cell: StatusCell,
-  //   }),
   columnHelper.display({
     id: "actions",
     header: "",
