@@ -1,0 +1,16 @@
+{
+  "nav": {
+    "dashboards": {
+      "dashboards": "Dashboards",
+      "home": "Home",
+      "pasar": "Pasar",
+      "komoditas": "Komoditas",
+      "petugas": "Petugas"
+    },
+    "settings": {
+      "settings": "Settings",
+      "general": "General",
+      "appearance": "Appearance"
+    }
+  }
+}
