@@ -121,7 +121,7 @@ export function AppointmentsTable() {
                   {headerGroup.headers.map((header) => (
                     <Th
                       key={header.id}
-                      className="dark:bg-dark-800 dark:text-dark-100 bg-gray-200 font-semibold text-gray-800 uppercase first:ltr:rounded-tl-lg last:ltr:rounded-tr-lg first:rtl:rounded-tr-lg last:rtl:rounded-tl-lg"
+                      className="dark:bg-dark-800 dark:text-dark-100 bg-gray-200 text-center font-semibold text-gray-800 uppercase first:ltr:rounded-tl-lg last:ltr:rounded-tr-lg first:rtl:rounded-tr-lg last:rtl:rounded-tl-lg"
                     >
                       {header.column.getCanSort() ? (
                         <div

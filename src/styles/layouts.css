@@ -11,10 +11,11 @@
   @apply xl:[--margin-x:1.5rem];
 }
 
-[data-layout="main-layout"] main.main-content,
-[data-layout="main-layout"] .app-header {
-  @apply md:ltr:ml-(--main-panel-width) md:rtl:mr-(--main-panel-width);
+[data-layout="main-layout"]:not(.is-sidebar-open) main.main-content,
+[data-layout="main-layout"]:not(.is-sidebar-open) .app-header {
+  @apply md:ltr:ml-0 md:rtl:mr-0;
 }
+
 
 [data-layout="main-layout"].is-sidebar-open main.main-content,
 [data-layout="main-layout"].is-sidebar-open .app-header {

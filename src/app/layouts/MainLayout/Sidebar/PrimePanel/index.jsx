@@ -8,14 +8,11 @@ import { useTranslation } from "react-i18next";
 import { useThemeContext } from "app/contexts/theme/context";
 import { Button } from "components/ui";
 import { Menu } from "./Menu";
+import { Profile } from "../../Profile";
 
 // ----------------------------------------------------------------------
 
-export function PrimePanel({
-  currentSegment,
-  pathname,
-  close,
-}) {
+export function PrimePanel({ currentSegment, pathname, close }) {
   const { cardSkin } = useThemeContext();
   const { t } = useTranslation();
 
@@ -36,8 +33,8 @@ export function PrimePanel({
           cardSkin === "shadow" ? "dark:bg-dark-750" : "dark:bg-dark-900",
         )}
       >
-        <div className="relative flex h-16 w-full shrink-0 items-center justify-between pl-4 pr-1 rtl:pl-1 rtl:pr-4">
-          <p className="truncate text-base tracking-wider text-gray-800 dark:text-dark-100">
+        <div className="relative flex h-16 w-full shrink-0 items-center justify-between pr-1 pl-4 rtl:pr-4 rtl:pl-1">
+          <p className="dark:text-dark-100 truncate text-base tracking-wider text-gray-800">
             {title}
           </p>
           <Button
@@ -50,11 +47,11 @@ export function PrimePanel({
           </Button>
         </div>
         {currentSegment?.childs && (
-          <Menu
-            nav={currentSegment?.childs}
-            pathname={pathname}
-          />
+          <Menu nav={currentSegment?.childs} pathname={pathname} />
         )}
+      </div>
+      <div className="items-start px-5 py-5">
+        <Profile />
       </div>
     </div>
   );
