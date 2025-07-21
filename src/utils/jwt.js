@@ -7,7 +7,7 @@ import axios from "./axios";
  * @param {string} authToken - The JWT token to validate.
  * @returns {boolean} - Returns `true` if the token is valid, otherwise `false`.
  */
-const isTokenValid = (authToken) => {
+export const isTokenValid = (authToken) => {
   if (typeof authToken !== "string") {
     console.error("Invalid token format.");
     return false;
@@ -29,16 +29,15 @@ const isTokenValid = (authToken) => {
  *
  * @param {string} [authToken] - The JWT token to set. If `undefined` or `null`, the session will be cleared.
  */
-const setSession = (authToken) => {
-  if (typeof authToken === "string" && authToken.trim() !== "") {
-    // Store token in local storage and set authorization header for axios
-    localStorage.setItem("authToken", authToken);
-    axios.defaults.headers.common.Authorization = `Bearer ${authToken}`;
+export const setSession = (accessToken) => {
+  if (accessToken) {
+    localStorage.setItem("authToken", accessToken);
+    axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
   } else {
-    // Remove token from local storage and delete authorization header from axios
     localStorage.removeItem("authToken");
     delete axios.defaults.headers.common.Authorization;
   }
 };
 
-export { isTokenValid, setSession };
+
+

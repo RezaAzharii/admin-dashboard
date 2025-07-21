@@ -83,7 +83,7 @@ export function AuthProvider({ children }) {
         if (authToken && isTokenValid(authToken)) {
           setSession(authToken);
 
-          const response = await axios.get("/user/profile");
+          const response = await axios.get("/user");
           const { user } = response.data;
 
           dispatch({
@@ -117,40 +117,35 @@ export function AuthProvider({ children }) {
     init();
   }, []);
 
-  const login = async ({ username, password }) => {
-    dispatch({
-      type: "LOGIN_REQUEST",
-    });
+  const login = async ({ email, password }) => {
+  dispatch({ type: "LOGIN_REQUEST" });
 
-    try {
-      const response = await axios.post("/login", {
-        username,
-        password,
-      });
+  try {
+    const response = await axios.post("/login", { email, password });
 
-      const { authToken, user } = response.data;
+    const { access_token, user } = response.data;
 
-      if (!isString(authToken) && !isObject(user)) {
-        throw new Error("Response is not vallid");
-      }
-
-      setSession(authToken);
-
-      dispatch({
-        type: "LOGIN_SUCCESS",
-        payload: {
-          user,
-        },
-      });
-    } catch (err) {
-      dispatch({
-        type: "LOGIN_ERROR",
-        payload: {
-          errorMessage: err,
-        },
-      });
+    if (!isString(access_token) || !isObject(user)) {
+      throw new Error("Response is not valid");
     }
-  };
+
+    setSession(access_token); // simpan ke localStorage & axios headers
+
+    dispatch({
+      type: "LOGIN_SUCCESS",
+      payload: { user },
+    });
+  } catch (err) {
+    dispatch({
+      type: "LOGIN_ERROR",
+      payload: {
+        errorMessage: err.response?.data?.message || "Login failed",
+      },
+    });
+  }
+};
+
+
 
   const logout = async () => {
     setSession(null);
