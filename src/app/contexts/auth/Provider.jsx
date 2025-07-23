@@ -1,15 +1,15 @@
-// Import Dependencies
+// src/app/contexts/auth/Provider.jsx
+
 import { useEffect, useReducer } from "react";
-import isObject from "lodash/isObject";
 import PropTypes from "prop-types";
+import isObject from "lodash/isObject";
 import isString from "lodash/isString";
 
-// Local Imports
 import axios from "utils/axios";
 import { isTokenValid, setSession } from "utils/jwt";
-import { AuthContext } from "./context";
+import AuthContext from "./authContext";
 
-// ----------------------------------------------------------------------
+// --------------------------------------------
 
 const initialState = {
   isAuthenticated: false,
@@ -20,43 +20,24 @@ const initialState = {
 };
 
 const reducerHandlers = {
-  INITIALIZE: (state, action) => {
-    const { isAuthenticated, user } = action.payload;
-    return {
-      ...state,
-      isAuthenticated,
-      isInitialized: true,
-      user,
-    };
-  },
-
-  LOGIN_REQUEST: (state) => {
-    return {
-      ...state,
-      isLoading: true,
-    };
-  },
-
-  LOGIN_SUCCESS: (state, action) => {
-    const { user } = action.payload;
-    return {
-      ...state,
-      isAuthenticated: true,
-      isLoading: false,
-      user,
-    };
-  },
-
-  LOGIN_ERROR: (state, action) => {
-    const { errorMessage } = action.payload;
-
-    return {
-      ...state,
-      errorMessage,
-      isLoading: false,
-    };
-  },
-
+  INITIALIZE: (state, action) => ({
+    ...state,
+    isAuthenticated: action.payload.isAuthenticated,
+    isInitialized: true,
+    user: action.payload.user,
+  }),
+  LOGIN_REQUEST: (state) => ({ ...state, isLoading: true }),
+  LOGIN_SUCCESS: (state, action) => ({
+    ...state,
+    isAuthenticated: true,
+    isLoading: false,
+    user: action.payload.user,
+  }),
+  LOGIN_ERROR: (state, action) => ({
+    ...state,
+    errorMessage: action.payload.errorMessage,
+    isLoading: false,
+  }),
   LOGOUT: (state) => ({
     ...state,
     isAuthenticated: false,
@@ -66,10 +47,7 @@ const reducerHandlers = {
 
 const reducer = (state, action) => {
   const handler = reducerHandlers[action.type];
-  if (handler) {
-    return handler(state, action);
-  }
-  return state;
+  return handler ? handler(state, action) : state;
 };
 
 export function AuthProvider({ children }) {
@@ -82,34 +60,24 @@ export function AuthProvider({ children }) {
 
         if (authToken && isTokenValid(authToken)) {
           setSession(authToken);
-
           const response = await axios.get("/user");
           const { user } = response.data;
 
           dispatch({
             type: "INITIALIZE",
-            payload: {
-              isAuthenticated: true,
-              user,
-            },
+            payload: { isAuthenticated: true, user },
           });
         } else {
           dispatch({
             type: "INITIALIZE",
-            payload: {
-              isAuthenticated: false,
-              user: null,
-            },
+            payload: { isAuthenticated: false, user: null },
           });
         }
       } catch (err) {
         console.error(err);
         dispatch({
           type: "INITIALIZE",
-          payload: {
-            isAuthenticated: false,
-            user: null,
-          },
+          payload: { isAuthenticated: false, user: null },
         });
       }
     };
@@ -117,19 +85,21 @@ export function AuthProvider({ children }) {
     init();
   }, []);
 
-  const login = async ({ email, password }) => {
+const login = async ({ email, password }) => {
   dispatch({ type: "LOGIN_REQUEST" });
 
   try {
     const response = await axios.post("/login", { email, password });
-
     const { access_token, user } = response.data;
 
     if (!isString(access_token) || !isObject(user)) {
-      throw new Error("Response is not valid");
+      throw new Error("Invalid response format");
     }
 
-    setSession(access_token); // simpan ke localStorage & axios headers
+    setSession(access_token);
+
+    // Simpan role ke local storage
+    localStorage.setItem("role", user.role);
 
     dispatch({
       type: "LOGIN_SUCCESS",
@@ -139,25 +109,22 @@ export function AuthProvider({ children }) {
     dispatch({
       type: "LOGIN_ERROR",
       payload: {
-        errorMessage: err.response?.data?.message || "Login failed",
+        errorMessage: err?.message || "Login failed",
       },
     });
   }
 };
 
 
+  const logout = () => {
+  setSession(null);
+  localStorage.removeItem("role"); // bersihkan role dari local storage
+  dispatch({ type: "LOGOUT" });
+};
 
-  const logout = async () => {
-    setSession(null);
-    dispatch({ type: "LOGOUT" });
-  };
-
-  if (!children) {
-    return null;
-  }
 
   return (
-    <AuthContext
+    <AuthContext.Provider
       value={{
         ...state,
         login,
@@ -165,7 +132,7 @@ export function AuthProvider({ children }) {
       }}
     >
       {children}
-    </AuthContext>
+    </AuthContext.Provider>
   );
 }
 

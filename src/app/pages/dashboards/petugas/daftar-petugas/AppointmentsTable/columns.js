@@ -29,6 +29,11 @@ export const columns = [
     header: "email",
     cell: EmailCell,
   }),
+  //   columnHelper.accessor((row) => row.status, {
+  //     id: "status",
+  //     header: "status",
+  //     cell: StatusCell,
+  //   }),
   columnHelper.display({
     id: "actions",
     header: "",

@@ -1,4 +1,3 @@
-// Import Dependencies
 import {
   Dialog,
   Menu,
@@ -8,7 +7,6 @@ import {
   Transition,
 } from "@headlessui/react";
 import {
-  ArrowUpTrayIcon,
   EllipsisVerticalIcon,
   EyeIcon,
   EyeSlashIcon,
@@ -16,22 +14,85 @@ import {
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { Fragment, useState } from "react";
-import { CiViewTable } from "react-icons/ci";
+import axios from "axios";
 
-// Local Imports
 import { Button, Input } from "components/ui";
 import { useDisclosure } from "hooks";
-// ----------------------------------------------------------------------
+import API from "configs/api.config"; // REGISTER: `${BASE_URL}/register`
 
-export function MenuAction() {
+export function MenuAction({ fetchUsers }) {
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [show, { toggle }] = useDisclosure();
+  const [showPassword, { toggle }] = useDisclosure();
+  const [loading, setLoading] = useState(false);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    password_confirmation: "",
+    is_admin: false,
+    is_petugas_pasar: true,
+  });
 
   const openForm = () => setIsFormOpen(true);
-  const closeForm = () => setIsFormOpen(false);
+  const closeForm = () => {
+    setIsFormOpen(false);
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+      password_confirmation: "",
+      is_admin: false,
+      is_petugas_pasar: true,
+    });
+  };
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleSubmit = async () => {
+    if (formData.password !== formData.password_confirmation) {
+      alert("Password dan konfirmasi password tidak cocok.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("authToken");
+
+      const response = await axios.post(API.AUTH.REGISTER, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      alert("Petugas berhasil ditambahkan!");
+      console.log("Respon:", response.data);
+
+      
+      if (fetchUsers) {
+        await fetchUsers(); 
+      }
+      closeForm();
+    } catch (error) {
+      console.error("Gagal menambahkan petugas:", error.response?.data);
+      alert(
+        error.response?.data?.message ||
+        "Terjadi kesalahan saat menyimpan data."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
+      {/* Tombol menu */}
       <Menu as="div" className="relative inline-block text-left">
         <MenuButton
           as={Button}
@@ -49,15 +110,16 @@ export function MenuAction() {
           leaveFrom="opacity-100 translate-y-0"
           leaveTo="opacity-0 translate-y-2"
         >
-          <MenuItems className="shadow-soft dark:border-dark-500 dark:bg-dark-700 absolute z-100 mt-1.5 min-w-[11rem] rounded-lg border border-gray-300 bg-white py-1 shadow-gray-200/50 outline-hidden focus-visible:outline-hidden ltr:right-0 rtl:left-0 dark:shadow-none">
+          <MenuItems className="absolute z-50 mt-1.5 min-w-[11rem] rounded-lg border border-gray-300 bg-white py-1 shadow-md ltr:right-0 rtl:left-0 dark:border-dark-500 dark:bg-dark-700">
             <MenuItem>
               {({ focus }) => (
                 <button
                   onClick={openForm}
                   className={clsx(
-                    "flex h-9 w-full items-center space-x-3 px-3 tracking-wide outline-hidden transition-colors",
-                    focus &&
-                      "dark:bg-dark-600 dark:text-dark-100 bg-gray-100 text-gray-800",
+                    "flex h-9 w-full items-center space-x-3 px-3 text-left transition-colors",
+                    focus
+                      ? "bg-gray-100 text-gray-800 dark:bg-dark-600 dark:text-dark-100"
+                      : "text-gray-700 dark:text-dark-200"
                   )}
                 >
                   <PlusIcon className="size-4.5" />
@@ -65,51 +127,11 @@ export function MenuAction() {
                 </button>
               )}
             </MenuItem>
-            <MenuItem>
-              {({ focus }) => (
-                <button
-                  className={clsx(
-                    "flex h-9 w-full items-center space-x-3 px-3 tracking-wide outline-hidden transition-colors",
-                    focus &&
-                      "dark:bg-dark-600 dark:text-dark-100 bg-gray-100 text-gray-800",
-                  )}
-                >
-                  <ArrowUpTrayIcon className="size-4.5" />
-                  <span>Export CVS</span>
-                </button>
-              )}
-            </MenuItem>
-            <MenuItem>
-              {({ focus }) => (
-                <button
-                  className={clsx(
-                    "flex h-9 w-full items-center space-x-3 px-3 tracking-wide outline-hidden transition-colors",
-                    focus &&
-                      "dark:bg-dark-600 dark:text-dark-100 bg-gray-100 text-gray-800",
-                  )}
-                >
-                  <ArrowUpTrayIcon className="size-4.5" />
-                  <span>Export PDF</span>
-                </button>
-              )}
-            </MenuItem>
-            <MenuItem>
-              {({ focus }) => (
-                <button
-                  className={clsx(
-                    "flex h-9 w-full items-center space-x-3 px-3 tracking-wide outline-hidden transition-colors",
-                    focus &&
-                      "dark:bg-dark-600 dark:text-dark-100 bg-gray-100 text-gray-800",
-                  )}
-                >
-                  <CiViewTable className="size-4.5" />
-                  <span>Save as view</span>
-                </button>
-              )}
-            </MenuItem>
           </MenuItems>
         </Transition>
       </Menu>
+
+      {/* Modal form tambah petugas */}
       <Transition appear show={isFormOpen} as={Fragment}>
         <Dialog as="div" className="relative z-50" onClose={closeForm}>
           <Transition.Child
@@ -135,50 +157,69 @@ export function MenuAction() {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="dark:border-dark-500 dark:bg-dark-700 w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  <Dialog.Title
-                    as="h3"
-                    className="text-dark-900 text-lg leading-6 font-medium dark:text-white"
-                  >
+                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all dark:border-dark-500 dark:bg-dark-700">
+                  <Dialog.Title className="text-lg font-medium leading-6 text-gray-900 dark:text-white">
                     Tambah Petugas
                   </Dialog.Title>
+
                   <div className="mt-4 space-y-4">
                     <Input
                       label="Nama"
+                      name="name"
                       type="text"
-                      placeholder="Masukan Nama"
-                      className="w-full rounded-md border border-gray-300 px-4 py-2"
+                      value={formData.name}
+                      onChange={handleChange}
+                      placeholder="Masukkan Nama"
+                      className="w-full"
                     />
                     <Input
                       label="Email"
+                      name="email"
                       type="email"
-                      placeholder="Masukan Email"
-                      className="w-full rounded-md border border-gray-300 px-4 py-2"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="Masukkan Email"
+                      className="w-full"
                     />
                     <Input
                       label="Password"
-                      type={show ? "text" : "password"}
-                      placeholder="Masukan Password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={handleChange}
+                      placeholder="Masukkan Password"
                       suffix={
                         <Button
                           variant="flat"
-                          className="pointer-events-auto size-6 shrink-0 rounded-full p-0"
+                          className="size-6 rounded-full p-0"
                           onClick={toggle}
                         >
-                          {show ? (
-                            <EyeIcon className="dark:text-dark-200 size-4.5 text-gray-500" />
+                          {showPassword ? (
+                            <EyeIcon className="size-4 text-gray-500 dark:text-dark-200" />
                           ) : (
-                            <EyeSlashIcon className="dark:text-dark-200 size-4.5 text-gray-500" />
+                            <EyeSlashIcon className="size-4 text-gray-500 dark:text-dark-200" />
                           )}
                         </Button>
                       }
                     />
+                    <Input
+                      label="Konfirmasi Password"
+                      name="password_confirmation"
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password_confirmation}
+                      onChange={handleChange}
+                      placeholder="Ulangi Password"
+                      className="w-full"
+                    />
                   </div>
+
                   <div className="mt-6 flex justify-end space-x-2">
                     <Button onClick={closeForm} variant="flat">
                       Batal
                     </Button>
-                    <Button onClick={() => {}}>Simpan</Button>
+                    <Button onClick={handleSubmit} disabled={loading}>
+                      {loading ? "Menyimpan..." : "Simpan"}
+                    </Button>
                   </div>
                 </Dialog.Panel>
               </Transition.Child>

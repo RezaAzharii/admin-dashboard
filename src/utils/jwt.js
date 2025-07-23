@@ -8,14 +8,14 @@ import axios from "./axios";
  * @returns {boolean} - Returns `true` if the token is valid, otherwise `false`.
  */
 export const isTokenValid = (authToken) => {
-  if (typeof authToken !== "string") {
-    console.error("Invalid token format.");
+  if (typeof authToken !== "string" || authToken.split(".").length !== 3) {
+    console.error("Invalid token format (missing parts).");
     return false;
   }
 
   try {
     const decoded = jwtDecode(authToken);
-    const currentTime = Date.now() / 1000; // Current time in seconds since epoch
+    const currentTime = Date.now() / 1000;
 
     return decoded.exp > currentTime;
   } catch (err) {
@@ -23,6 +23,7 @@ export const isTokenValid = (authToken) => {
     return false;
   }
 };
+
 
 /**
  * Sets or removes the authentication token in local storage and axios headers.

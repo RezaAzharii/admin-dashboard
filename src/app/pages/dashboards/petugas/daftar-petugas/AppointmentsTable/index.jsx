@@ -1,4 +1,12 @@
-// Local Imports
+import { useEffect, useRef, useState } from "react";
+import axios from "axios";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+import {
+  PencilIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
+
 import {
   flexRender,
   getCoreRowModel,
@@ -8,89 +16,171 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import clsx from "clsx";
-import { useRef, useState } from "react";
 
-// Import Dependencies
+import { Card, Table, THead, TBody, Th, Tr, Td } from "components/ui";
 import { CollapsibleSearch } from "components/shared/CollapsibleSearch";
 import { TableSortIcon } from "components/shared/table/TableSortIcon";
 import { PaginationSection } from "components/shared/table/PaginationSection";
 import { SelectedRowsActions } from "components/shared/table/SelectedRowsActions";
-import { Card, Table, THead, TBody, Th, Tr, Td } from "components/ui";
 import { useBoxSize, useDidUpdate } from "hooks";
 import { fuzzyFilter } from "utils/react-table/fuzzyFilter";
 import { useSkipper } from "utils/react-table/useSkipper";
-import { MenuAction } from "./MenuActions";
-import { columns } from "./columns";
-import { appointmentsList } from "./fakeData";
 import { getUserAgentBrowser } from "utils/dom/getUserAgentBrowser";
+import { MenuAction } from "./MenuActions";
 
-// ----------------------------------------------------------------------
+import API from "../../../../../../configs/api.config";
 
 const isSafari = getUserAgentBrowser() === "Safari";
+const MySwal = withReactContent(Swal);
 
 export function AppointmentsTable() {
-  const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper();
-  const theadRef = useRef();
-
-  const { height: theadHeight } = useBoxSize({ ref: theadRef });
-
-  const [appointments, setAppointments] = useState([...appointmentsList]);
-
+  const [appointments, setAppointments] = useState([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState([]);
+  const [loading, setLoading] = useState(false); // ✅ Tambahkan ini
+
+  const [autoResetPageIndex] = useSkipper();
+  const theadRef = useRef();
+  const { height: theadHeight } = useBoxSize({ ref: theadRef });
+
+  const fetchUsers = async () => {
+    setLoading(true); // ✅ aktifkan loading saat mulai fetch
+    try {
+      const response = await axios.get(API.USERS.INDEX, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
+
+      const users = response.data?.data ?? [];
+
+      const mappedUsers = users.map((user) => ({
+        user_id: user.id,
+        name: user.name,
+        email: user.email,
+        avatar: null,
+      }));
+
+      setAppointments(mappedUsers);
+    } catch (error) {
+      console.error("Gagal memuat data user:", error);
+    } finally {
+      setLoading(false); // ✅ matikan loading setelah selesai
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const handleDelete = async (user_id) => {
+    const confirm = await MySwal.fire({
+      title: "Yakin hapus data ini?",
+      text: "Data tidak bisa dikembalikan!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, hapus!",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      await axios.delete(API.USERS.DELETE(user_id), {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
+
+      setAppointments((old) => old.filter((user) => user.user_id !== user_id));
+
+      MySwal.fire("Terhapus!", "Data berhasil dihapus.", "success");
+    } catch (err) {
+      console.error("Gagal menghapus:", err);
+      MySwal.fire("Gagal", "Gagal menghapus user.", "error");
+    }
+  };
+
+  const handleEdit = async (user) => {
+    const result = await MySwal.fire({
+      title: "Edit User",
+      html: `
+        <input id="swal-name" class="swal2-input" placeholder="Nama" value="${user.name}" />
+        <input id="swal-email" class="swal2-input" placeholder="Email" value="${user.email}" />
+      `,
+      focusConfirm: false,
+      showCancelButton: true,
+      preConfirm: () => {
+        return {
+          name: document.getElementById("swal-name").value,
+          email: document.getElementById("swal-email").value,
+        };
+      },
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await axios.put(API.USERS.UPDATE(user.user_id), result.value, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
+
+      fetchUsers();
+      MySwal.fire("Tersimpan!", "Data berhasil diperbarui.", "success");
+    } catch (err) {
+      console.error("Gagal update:", err);
+      MySwal.fire("Gagal", "Gagal memperbarui user.", "error");
+    }
+  };
+
+  const columns = [
+    {
+      accessorKey: "name",
+      header: "Nama",
+    },
+    {
+      accessorKey: "email",
+      header: "Email",
+    },
+    {
+      id: "actions",
+      header: "Aksi",
+      cell: ({ row }) => (
+        <div className="flex gap-2">
+          <button
+            className="text-blue-600 hover:text-blue-800"
+            onClick={() => handleEdit(row.original)}
+          >
+            <PencilIcon className="w-5 h-5" />
+          </button>
+          <button
+            className="text-red-600 hover:text-red-800"
+            onClick={() => handleDelete(row.original.user_id)}
+          >
+            <TrashIcon className="w-5 h-5" />
+          </button>
+        </div>
+      ),
+    },
+  ];
 
   const table = useReactTable({
     data: appointments,
-    columns: columns,
+    columns,
     state: {
       globalFilter,
       sorting,
     },
-    meta: {
-      updateData: (rowIndex, columnId, value) => {
-        // Skip page index reset until after next rerender
-        skipAutoResetPageIndex();
-        setAppointments((old) =>
-          old.map((row, index) => {
-            if (index === rowIndex) {
-              return {
-                ...old[rowIndex],
-                [columnId]: value,
-              };
-            }
-            return row;
-          }),
-        );
-      },
-      deleteRow: (row) => {
-        // Skip page index reset until after next rerender
-        skipAutoResetPageIndex();
-        setAppointments((old) =>
-          old.filter((oldRow) => oldRow.user_id !== row.original.user_id),
-        );
-      },
-      deleteRows: (rows) => {
-        // Skip page index reset until after next rerender
-        skipAutoResetPageIndex();
-        const rowIds = rows.map((row) => row.original.user_id);
-        setAppointments((old) =>
-          old.filter((row) => !rowIds.includes(row.user_id)),
-        );
-      },
-    },
-
     filterFns: {
       fuzzy: fuzzyFilter,
     },
     getCoreRowModel: getCoreRowModel(),
-
     onGlobalFilterChange: setGlobalFilter,
     getFilteredRowModel: getFilteredRowModel(),
     globalFilterFn: fuzzyFilter,
-
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-
     getPaginationRowModel: getPaginationRowModel(),
     autoResetPageIndex,
   });
@@ -111,7 +201,7 @@ export function AppointmentsTable() {
           />
           <MenuAction />
         </div>
-      </div>
+        </div>
       <Card className="relative mt-3">
         <div className="table-wrapper min-w-full overflow-x-auto">
           <Table hoverable className="w-full text-left rtl:text-right">
@@ -121,7 +211,7 @@ export function AppointmentsTable() {
                   {headerGroup.headers.map((header) => (
                     <Th
                       key={header.id}
-                      className="dark:bg-dark-800 dark:text-dark-100 bg-gray-200 text-center font-semibold text-gray-800 uppercase first:ltr:rounded-tl-lg last:ltr:rounded-tr-lg first:rtl:rounded-tr-lg last:rtl:rounded-tl-lg"
+                      className="dark:bg-dark-800 dark:text-dark-100 bg-gray-200 text-left font-semibold text-gray-800 uppercase"
                     >
                       {header.column.getCanSort() ? (
                         <div
@@ -150,8 +240,14 @@ export function AppointmentsTable() {
               ))}
             </THead>
             <TBody>
-              {table.getRowModel().rows.map((row) => {
-                return (
+              {loading ? (
+                <Tr>
+                  <Td colSpan={columns.length} className="text-center py-4">
+                    Memuat data...
+                  </Td>
+                </Tr>
+              ) : table.getRowModel().rows.length > 0 ? (
+                table.getRowModel().rows.map((row) => (
                   <Tr
                     key={row.id}
                     className={clsx(
@@ -161,27 +257,31 @@ export function AppointmentsTable() {
                         "row-selected after:bg-primary-500/10 ltr:after:border-l-primary-500 rtl:after:border-r-primary-500 after:pointer-events-none after:absolute after:inset-0 after:z-2 after:h-full after:w-full after:border-3 after:border-transparent",
                     )}
                   >
-                    {row.getVisibleCells().map((cell) => {
-                      return (
-                        <Td key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </Td>
-                      );
-                    })}
+                    {row.getVisibleCells().map((cell) => (
+                      <Td key={cell.id} className="align-middle text-left">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </Td>
+                    ))}
                   </Tr>
-                );
-              })}
+                ))
+              ) : (
+                <Tr>
+                  <Td colSpan={columns.length} className="text-center py-4">
+                    Tidak ada data ditemukan.
+                  </Td>
+                </Tr>
+              )}
             </TBody>
           </Table>
         </div>
-        {table.getCoreRowModel().rows.length && (
+        {table.getCoreRowModel().rows.length > 0 && (
           <div className="p-4 sm:px-5">
             <PaginationSection table={table} />
           </div>
-        )}{" "}
+        )}
         <SelectedRowsActions table={table} height={theadHeight} />
       </Card>
     </div>

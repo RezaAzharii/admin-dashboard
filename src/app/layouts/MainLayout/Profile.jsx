@@ -10,10 +10,12 @@ import {
   Cog6ToothIcon,
 } from "@heroicons/react/24/outline";
 import { TbUser } from "react-icons/tb";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
 
 // Local Imports
 import { Avatar, AvatarDot, Button } from "components/ui";
+import { useContext } from "react";
+import AuthContext from "app/contexts/auth/authContext";
 
 // ----------------------------------------------------------------------
 
@@ -37,6 +39,14 @@ const links = [
 ];
 
 export function Profile() {
+  const { logout, user } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
     <Popover className="relative">
       <PopoverButton
@@ -77,11 +87,11 @@ export function Profile() {
                     className="hover:text-primary-600 focus:text-primary-600 dark:text-dark-100 dark:hover:text-primary-400 dark:focus:text-primary-400 text-base font-medium text-gray-700"
                     to="/settings/general"
                   >
-                    Travis Fuller
+                    {user?.name || "Your Name"}
                   </Link>
 
                   <p className="dark:text-dark-300 mt-0.5 text-xs text-gray-400">
-                    Product Designer
+                    {user?.email || "your@email.com"}
                   </p>
                 </div>
               </div>
@@ -111,7 +121,7 @@ export function Profile() {
                   </Link>
                 ))}
                 <div className="px-4 pt-4">
-                  <Button className="w-full gap-2">
+                  <Button className="w-full gap-2" onClick={handleLogout}>
                     <ArrowLeftStartOnRectangleIcon className="size-4.5" />
                     <span>Logout</span>
                   </Button>
