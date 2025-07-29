@@ -6,6 +6,7 @@ import axios from "utils/axios";
 import { setSession } from "utils/jwt";
 import AuthContext from "./authContext";
 
+// --- State awal ---
 const initialState = {
   isAuthenticated: false,
   isLoading: false,
@@ -14,6 +15,7 @@ const initialState = {
   user: null,
 };
 
+// --- Reducer handlers ---
 const reducerHandlers = {
   INITIALIZE: (state, action) => ({
     ...state,
@@ -41,6 +43,7 @@ const reducerHandlers = {
   }),
 };
 
+// --- Reducer utama ---
 const reducer = (state, action) => {
   const handler = reducerHandlers[action.type];
   return handler ? handler(state, action) : state;
@@ -51,27 +54,30 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const init = async () => {
-      console.log("AuthProvider init running...");
+      console.log("🔄 AuthProvider init running...");
 
       try {
         const authToken = localStorage.getItem("authToken");
-        console.log("Auth token from localStorage:", authToken);
+        console.log("🧩 Auth token from localStorage:", authToken);
 
         if (authToken) {
           setSession(authToken);
+          console.log("📡 Fetching /user/me from API with token...");
 
-          const response = await axios.get("/user");
-          const { user } = response.data;
+          const response = await axios.get("/user/me");
+          console.log("✅ Full /user response:", response.data);
+
+          // Ambil data user dari response.data.data
+          const user = response.data?.data;
 
           if (isObject(user)) {
-            console.log("User data loaded from API:", user);
-
+            console.log("✅ Loaded user data:", user);
             dispatch({
               type: "INITIALIZE",
               payload: { isAuthenticated: true, user },
             });
           } else {
-            console.warn("User data is invalid, clearing session...");
+            console.warn("⚠️ User data invalid → clearing session...");
             setSession(null);
             localStorage.removeItem("authToken");
             dispatch({
@@ -80,14 +86,14 @@ export function AuthProvider({ children }) {
             });
           }
         } else {
-          console.log("No auth token found → redirect to login");
+          console.log("❌ No auth token found → user is not authenticated");
           dispatch({
             type: "INITIALIZE",
             payload: { isAuthenticated: false, user: null },
           });
         }
       } catch (err) {
-        console.error("INIT error:", err);
+        console.error("🚨 INIT error:", err);
         setSession(null);
         localStorage.removeItem("authToken");
         dispatch({
@@ -100,11 +106,13 @@ export function AuthProvider({ children }) {
     init();
   }, []);
 
+  // --- Fungsi login ---
   const login = async ({ email, password }) => {
     dispatch({ type: "LOGIN_REQUEST" });
     try {
+      console.log("🔑 Attempting login...");
       const response = await axios.post("/login", { email, password });
-      console.log("Login response:", response.data);
+      console.log("✅ Login response:", response.data);
 
       const { access_token, user } = response.data;
 
@@ -114,10 +122,11 @@ export function AuthProvider({ children }) {
 
       setSession(access_token);
       localStorage.setItem("authToken", access_token);
+      console.log("📝 Token saved to localStorage:", access_token);
 
       dispatch({ type: "LOGIN_SUCCESS", payload: { user } });
     } catch (err) {
-      console.error("Login error:", err);
+      console.error("❌ Login error:", err);
       dispatch({
         type: "LOGIN_ERROR",
         payload: { errorMessage: err?.message || "Login failed" },
@@ -125,14 +134,18 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // --- Fungsi logout ---
   const logout = () => {
+    console.log("🚪 Logging out...");
     setSession(null);
     localStorage.removeItem("authToken");
     dispatch({ type: "LOGOUT" });
-    window.location.reload(); // opsional, jika ingin reset semua state global
+    window.location.reload(); // opsional: reset semua state global
   };
 
+  // --- Saat init belum selesai, tampilkan loading/null ---
   if (!state.isInitialized) {
+    console.log("⏳ Waiting for init...");
     return null; // Atau <LoadingScreen /> agar UX lebih baik
   }
 
