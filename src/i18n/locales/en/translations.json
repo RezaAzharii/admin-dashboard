@@ -4,8 +4,9 @@
       "dashboards": "Dashboards",
       "home": "Home",
       "pasar": "Pasar",
-      "komoditas": "Komoditas",
-      "petugas": "Petugas"
+      "inputharga": "inputharga",
+      "petugas": "Petugas",
+      "bahanpokok": "bahanpokok"
     },
     "settings": {
       "settings": "Settings",

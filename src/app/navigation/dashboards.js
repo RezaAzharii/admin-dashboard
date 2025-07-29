@@ -30,18 +30,25 @@ export const dashboards = {
       transKey: "nav.dashboards.pasar",
     },
     {
-      id: "dashboards.komoditas",
-      path: path(ROOT_DASHBOARDS, "/komoditas"),
-      type: NAV_TYPE_ITEM,
-      title: "Komoditas",
-      transKey: "nav.dashboards.komoditas",
-    },
-    {
       id: "dashboards.daftar-petugas",
       path: path(ROOT_DASHBOARDS, "/daftar-petugas"),
       type: NAV_TYPE_ITEM,
       title: "Petugas",
       transKey: "nav.dashboards.petugas",
     },
+    {
+      id:"dashboards.inputharga",
+      path: path(ROOT_DASHBOARDS,"/inputharga"),
+      type: NAV_TYPE_ITEM,
+      title: "inputharga",
+      transkey:"nav.dashboards.inputharga"
+    },
+    {
+      id: "dashboards.bahanpokok",
+      path: path(ROOT_DASHBOARDS,"/bahanpokok"),
+      type: NAV_TYPE_ITEM,
+      title:"bahanpokok",
+      transkey:"nav.dashboards.bahanpokok"
+    }
   ],
 };

@@ -35,17 +35,6 @@ const protectedRoutes = {
             },
             {
               index: true,
-              element: <Navigate to="/dashboards/komoditas" />,
-            },
-            {
-              path: "komoditas",
-              lazy: async () => ({
-                Component: (await import("app/pages/dashboards/komoditas"))
-                  .default,
-              }),
-            },
-            {
-              index: true,
               element: <Navigate to="/dashboards/pasar" />,
             },
             {
@@ -62,6 +51,28 @@ const protectedRoutes = {
               path: "daftar-petugas",
               lazy: async () => ({
                 Component: (await import("app/pages/dashboards/petugas"))
+                  .default,
+              }),
+            },
+            {
+              index: true,
+              element: <Navigate to="/dashboards/inputharga" />,
+            },
+            {
+              path: "inputharga",
+              lazy: async () => ({
+                Component: (await import("app/pages/dashboards/inputharga"))
+                  .default,
+              }),
+            },
+            {
+              index: true,
+              element: <Navigate to="/dashboards/bahanpokok" />,
+            },
+            {
+              path: "bahanpokok",
+              lazy: async () => ({
+                Component: (await import("app/pages/dashboards/bahanpokok"))
                   .default,
               }),
             },
