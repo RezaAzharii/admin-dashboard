@@ -1,5 +1,5 @@
 // Import Dependencies
-import { useMemo, useState } from "react";
+import { useMemo, useState, useContext } from "react";
 import { useLocation } from "react-router";
 
 // Local Imports
@@ -8,9 +8,8 @@ import { useSidebarContext } from "app/contexts/sidebar/context";
 import { navigation } from "app/navigation";
 import { useDidUpdate } from "hooks";
 import { isRouteActive } from "utils/isRouteActive";
-// import { MainPanel } from "./MainPanel";
 import { PrimePanel } from "./PrimePanel";
-// import { MainPanel } from "./MainPanel";
+import AuthContext from "app/contexts/auth/authContext";
 
 // ----------------------------------------------------------------------
 
@@ -18,50 +17,65 @@ export function Sidebar() {
   const { pathname } = useLocation();
   const { name, lgAndDown } = useBreakpointsContext();
   const { isExpanded, close } = useSidebarContext();
+  const { user, isInitialized } = useContext(AuthContext);
 
+  // Temukan segment aktif di awal (saat load pertama)
   const initialSegment = useMemo(
     () => navigation.find((item) => isRouteActive(item.path, pathname)),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
+  const [activeSegmentPath, setActiveSegmentPath] = useState(initialSegment?.path);
 
-  const [activeSegmentPath, setActiveSegmentPath] = useState(
-    initialSegment?.path,
-  );
+  // Filter navigation sesuai user
+  const filteredNavigation = useMemo(() => {
+    if (!isInitialized || !user) return [];
 
+    console.log("✅ Filtering navigation. user.is_admin:", user.is_admin);
+
+    return navigation.map((segment) => {
+      if (segment.id === "dashboards" && Array.isArray(segment.childs)) {
+        return {
+          ...segment,
+          childs: segment.childs.filter((child) => {
+            // contoh: hanya admin yg boleh lihat daftar-petugas
+            if (child.id === "dashboards.daftar-petugas") {
+              return !!user.is_admin;
+            }
+            return true;
+          }),
+        };
+      }
+      return segment;
+    });
+  }, [isInitialized, user]);
+
+  // Temukan segment aktif (setelah difilter)
   const currentSegment = useMemo(() => {
-    return navigation.find((item) => item.path === activeSegmentPath);
-  }, [activeSegmentPath]);
+    return filteredNavigation.find((item) => item.path === activeSegmentPath);
+  }, [activeSegmentPath, filteredNavigation]);
 
   useDidUpdate(() => {
-    const activePath = navigation.find((item) =>
+    const activePath = filteredNavigation.find((item) =>
       isRouteActive(item.path, pathname),
     )?.path;
 
     if (!isRouteActive(activeSegmentPath, pathname)) {
       setActiveSegmentPath(activePath);
     }
-  }, [pathname]);
+  }, [pathname, filteredNavigation]);
 
   useDidUpdate(() => {
     if (lgAndDown && isExpanded) close();
   }, [name]);
 
   return (
-    <>
-      {/* <MainPanel
-        nav={navigation}
-        activeSegment={activeSegmentPath}
-        setActiveSegment={setActiveSegmentPath}
-      /> */}
-      <PrimePanel
-        nav={navigation}
-        activeSegment={activeSegmentPath}
-        setActiveSegment={setActiveSegmentPath}
-        close={close}
-        currentSegment={currentSegment}
-        pathname={pathname}
-      />
-    </>
+    <PrimePanel
+      nav={filteredNavigation}
+      activeSegment={activeSegmentPath}
+      setActiveSegment={setActiveSegmentPath}
+      close={close}
+      currentSegment={currentSegment}
+      pathname={pathname}
+    />
   );
 }

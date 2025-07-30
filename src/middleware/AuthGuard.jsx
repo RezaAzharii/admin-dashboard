@@ -4,9 +4,9 @@ import { GHOST_ENTRY_PATH, REDIRECT_URL_KEY } from "../constants/app.constant";
 
 export default function AuthGuard() {
   const outlet = useOutlet();
-  const { isAuthenticated, isInitialized } = useAuthContext();
+  const { user,isAuthenticated, isInitialized } = useAuthContext();
   const location = useLocation();
-
+  
   if (!isInitialized) {
     return null; // atau <LoadingScreen />
   }
@@ -18,6 +18,16 @@ export default function AuthGuard() {
         replace
       />
     );
+  }
+
+  // contoh: cek adminOnly
+  const route = location.pathname;
+  if (
+    route.includes("/dashboards/daftar-petugas") &&
+    !user?.is_admin
+  ) {
+    // redirect ke home atau 403
+    return <Navigate to="/dashboards/home" replace />;
   }
 
   return <>{outlet}</>;

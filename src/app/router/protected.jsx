@@ -49,6 +49,7 @@ const protectedRoutes = {
             },
             {
               path: "daftar-petugas",
+              auth: { adminOnly: true },
               lazy: async () => ({
                 Component: (await import("app/pages/dashboards/petugas"))
                   .default,

@@ -13,6 +13,7 @@ import { Menu } from "./Menu";
 // ----------------------------------------------------------------------
 
 export function Sidebar() {
+  console.log("🔥 Sidebar render!");
   const { cardSkin } = useThemeContext();
   const { name, lgAndDown } = useBreakpointsContext();
 

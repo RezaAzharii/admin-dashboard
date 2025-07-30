@@ -9,6 +9,9 @@ import { useDidUpdate, useIsomorphicEffect } from "hooks";
 import AuthContext from "app/contexts/auth/authContext";
 
 export function Menu() {
+  console.log("🔥 Menu component render!");
+  console.log("➡️ isInitialized:", isInitialized);
+  console.log("➡️ user:", user);
   const { pathname } = useLocation();
   const ref = useRef();
 
@@ -17,23 +20,26 @@ export function Menu() {
   console.log("Menu render: user=", user, "isInitialized=", isInitialized);
 
   const navigation = useMemo(() => {
-    if (!isInitialized || !user) return [];
+  console.log("🧩 useMemo triggered!");
+  console.log("🔍 user:", user);
+  console.log("🔍 user?.is_admin:", user?.is_admin);
+  console.log("🔍 rawNavigation:", rawNavigation);
+  if (!isInitialized || !user) return [];
+  console.log("➡️ user.is_admin di useMemo:", user.is_admin);
+  return rawNavigation.map((nav) => {
+    if (nav.id === "dashboards" && Array.isArray(nav.childs)) {
+      return {
+        ...nav,
+        childs: nav.childs.filter((item) => {
+          console.log("📌 Checking user.is_admin inside filter:", user.is_admin);
+          return !!user.is_admin;
+        }),
+      };
+    }
+    return nav;
+  });
+}, [isInitialized, user]);
 
-    return rawNavigation.map((nav) => {
-      if (nav.id === "dashboards" && Array.isArray(nav.childs)) {
-        return {
-          ...nav,
-          childs: nav.childs.filter((item) => {
-            if (item.id === "dashboards.daftar-petugas") {
-              return user.is_admin === true; // hanya admin
-            }
-            return true;
-          }),
-        };
-      }
-      return nav;
-    });
-  }, [isInitialized, user]);
 
   const activeGroup = navigation.find((item) =>
     item.path && isRouteActive(item.path, pathname)
