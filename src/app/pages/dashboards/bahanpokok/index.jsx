@@ -97,12 +97,12 @@ export default function BahanPokok() {
   };
 
   const handleChange = (e) => {
-  const { name, value, type } = e.target;
-  setFormData(prev => ({
-    ...prev,
-    [name]: type === 'number' ? Number(value) : value
-  }));
-};
+    const { name, value, type } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "number" ? Number(value) : value,
+    }));
+  };
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
@@ -133,8 +133,8 @@ export default function BahanPokok() {
       if (formData.urutan) submitData.append("urutan", formData.urutan);
       submitData.append("nama", formData.nama);
       submitData.append("satuan", formData.satuan);
-      submitData.append("stok_wajib", formData.stok_wajib );
-      submitData.append("up_stok", formData.up_stok );
+      submitData.append("stok_wajib", formData.stok_wajib);
+      submitData.append("up_stok", formData.up_stok);
 
       if (photoFile) {
         submitData.append("foto", photoFile);
@@ -374,7 +374,7 @@ export default function BahanPokok() {
                     <img
                       src={`http://127.0.0.1:8000${item.foto}`}
                       alt={item.nama}
-                      className="h-12 w-12 rounded-lg object-cover shadow-md"
+                      className="h-16 w-16 rounded-lg object-cover shadow-md"
                       onError={(e) => {
                         e.target.src =
                           "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiBmaWxsPSIjNEI1NTYzIi8+CjxwYXRoIGQ9Ik0yNCAzMkMxOS41ODE3IDMyIDE2IDI4LjQxODMgMTYgMjRDMTYgMTkuNTgxNyAxOS41ODE3IDE2IDI0IDE2QzI4LjQxODMgMTYgMzIgMTkuNTgxNyAzMiAyNEMzMiAyOC40MTgzIDI4LjQxODMgMzIgMjQgMzJaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo=";
@@ -406,7 +406,7 @@ export default function BahanPokok() {
                           : "bg-gray-600 text-gray-300"
                       }`}
                     >
-                      {item.stok_wajib}
+                      {item.up_stok}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm">
@@ -449,7 +449,7 @@ export default function BahanPokok() {
 
         {/* Enhanced Modal */}
         {showModal && (
-          <div className="bg-opacity-75 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
+          <div className="bg-opacity-75 fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
             <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-gray-800 shadow-2xl">
               {/* Modal Header */}
               <div className="rounded-t-xl border-b border-gray-600 bg-gray-700 px-6 py-4">
@@ -482,6 +482,55 @@ export default function BahanPokok() {
 
               {/* Modal Body */}
               <form onSubmit={handleSubmit} className="space-y-6 p-6">
+
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-gray-300">
+                    Nama Bahan Pokok <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="nama"
+                    value={formData.nama}
+                    onChange={handleChange}
+                    className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    placeholder="Masukkan nama bahan pokok"
+                    required
+                  />
+                </div>
+
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="mb-2 block text-sm font-semibold text-gray-300">
+                      Stok Wajib <span className="text-red-400">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      name="stok_wajib"
+                      value={formData.stok_wajib}
+                      onChange={handleChange}
+                      className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      placeholder="Masukkan jumlah stok wajib"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm font-semibold text-gray-300">
+                      Up Stok <span className="text-red-400">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      name="up_stok"
+                      value={formData.up_stok}
+                      onChange={handleChange}
+                      className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      placeholder="Masukkan jumlah up stok"
+                      required
+                    />
+                  </div>
+                </div>
+
+
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
                     <label className="mb-2 block text-sm font-semibold text-gray-300">
@@ -513,52 +562,6 @@ export default function BahanPokok() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-gray-300">
-                    Nama Bahan Pokok <span className="text-red-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="nama"
-                    value={formData.nama}
-                    onChange={handleChange}
-                    className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    placeholder="Masukkan nama bahan pokok"
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div>
-                    <label className="mb-2 block text-sm font-semibold text-gray-300">
-                      Stok Wajib <span className="text-red-400">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      name="stok_wajib"
-                      value={formData.stok_wajib}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                      placeholder="Masukkan jumlah stok wajib"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="mb-2 block text-sm font-semibold text-gray-300">
-                      Up Stok <span className="text-red-400">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      name="up_stok"
-                      value={formData.up_stok}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                      placeholder="Masukkan jumlah up stok"
-                      required
-                    />
-                  </div>
-                </div>
 
                 <div>
                   <label className="mb-2 block text-sm font-semibold text-gray-300">

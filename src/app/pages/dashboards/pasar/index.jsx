@@ -1,10 +1,19 @@
 import { Fragment, useState, useEffect } from "react";
 import { Plus, MapPin, Building2, Image, ChevronLeft, ChevronRight  } from "lucide-react";
-
+import Swal from "sweetalert2";
 import { Dialog, Transition } from "@headlessui/react";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+
+const redIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -17,94 +26,45 @@ const BASE_URL = "http://127.0.0.1:8000";
 // SweetAlert2 replacement component
 const showAlert = {
   success: (title, text = "") => {
-    const alertDiv = document.createElement("div");
-    alertDiv.className =
-      "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50";
-    alertDiv.innerHTML = `
-      <div class="bg-white rounded-lg p-6 max-w-sm mx-4 shadow-xl">
-        <div class="flex items-center mb-4">
-          <div class="flex-shrink-0 w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
-          </div>
-          <div class="ml-3">
-            <h3 class="text-lg font-medium text-gray-900">${title}</h3>
-            ${text ? `<p class="text-sm text-gray-500 mt-1">${text}</p>` : ""}
-          </div>
-        </div>
-        <div class="flex justify-end">
-          <button onclick="this.closest('.fixed').remove()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
-            OK
-          </button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(alertDiv);
-    setTimeout(() => alertDiv.remove(), 3000);
+    Swal.fire({
+      icon: 'success',
+      title: title,
+      text: text,
+      showConfirmButton: false, 
+      timer: 3000 
+    });
   },
 
   error: (title, text = "") => {
-    const alertDiv = document.createElement("div");
-    alertDiv.className =
-      "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50";
-    alertDiv.innerHTML = `
-      <div class="bg-white rounded-lg p-6 max-w-sm mx-4 shadow-xl">
-        <div class="flex items-center mb-4">
-          <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </div>
-          <div class="ml-3">
-            <h3 class="text-lg font-medium text-gray-900">${title}</h3>
-            ${text ? `<p class="text-sm text-gray-500 mt-1">${text}</p>` : ""}
-          </div>
-        </div>
-        <div class="flex justify-end">
-          <button onclick="this.closest('.fixed').remove()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
-            OK
-          </button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(alertDiv);
+    Swal.fire({
+      icon: 'error',
+      title: title,
+      text: text,
+      confirmButtonText: 'OK', 
+      customClass: {
+        confirmButton: 'bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors'
+      }
+    });
   },
 
   confirm: (title, text = "") => {
     return new Promise((resolve) => {
-      const alertDiv = document.createElement("div");
-      alertDiv.className =
-        "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50";
-      alertDiv.innerHTML = `
-        <div class="bg-white rounded-lg p-6 max-w-sm mx-4 shadow-xl">
-          <div class="flex items-center mb-4">
-            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
-              <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-              </svg>
-            </div>
-            <div class="ml-3">
-              <h3 class="text-lg font-medium text-gray-900">${title}</h3>
-              ${text ? `<p class="text-sm text-gray-500 mt-1">${text}</p>` : ""}
-            </div>
-          </div>
-          <div class="flex justify-end space-x-3">
-            <button onclick="this.closest('.fixed').remove(); window.confirmResult(false)" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-md text-sm font-medium transition-colors">
-              Batal
-            </button>
-            <button onclick="this.closest('.fixed').remove(); window.confirmResult(true)" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
-              Hapus
-            </button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(alertDiv);
-
-      window.confirmResult = (result) => {
-        resolve(result);
-        delete window.confirmResult;
-      };
+      Swal.fire({
+        icon: 'warning',
+        title: title,
+        text: text,
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626', 
+        cancelButtonColor: '#d1d5db', 
+        confirmButtonText: 'Hapus',
+        cancelButtonText: 'Batal',
+        reverseButtons: true,
+        customClass: {
+          cancelButton: 'text-gray-700'
+        }
+      }).then((result) => {
+        resolve(result.isConfirmed);
+      });
     });
   },
 };
@@ -319,7 +279,7 @@ const MarketFormModal = ({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/50" aria-hidden="true" />
+          <div className="fixed inset-0 bg-black/70" aria-hidden="true" />
         </Transition.Child>
 
         <div className="fixed inset-0 flex items-center justify-center overflow-y-auto p-4">
@@ -420,7 +380,7 @@ const MarketFormModal = ({
                         >
                           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                           <MapClickHandler />
-                          {position && <Marker position={position} />}
+                          {position && <Marker position={position} icon={redIcon}/>}
                         </MapContainer>
                       </div>
 
@@ -770,7 +730,6 @@ const Pasar = () => {
     setSelectedPasar(null);
     setIsEdit(false);
     setShowForm(true);
-    // No need to loadPasars(true) here, it's called after submit
   };
 
   const handleEdit = (pasar) => {

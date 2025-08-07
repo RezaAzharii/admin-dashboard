@@ -30,5 +30,13 @@ export default function AuthGuard() {
     return <Navigate to="/dashboards/home" replace />;
   }
 
+  // ❌ Hanya admin yang boleh akses pasar
+  if (
+    route.includes("/dashboards/pasar") &&
+    !user?.is_admin
+  ) {
+    return <Navigate to="/dashboards/home" replace />;
+  }
+
   return <>{outlet}</>;
 }

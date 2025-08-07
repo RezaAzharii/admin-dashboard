@@ -11,15 +11,15 @@ export const dashboards = {
   type: NAV_TYPE_ROOT,
   path: "/dashboards",
   title: "Dashboards",
-  transKey: "nav.dashboards.dashboards",
+  transKey: "nav.dashboards.dashboard",
   Icon: DashboardsIcon,
   childs: [
     {
-      id: "dashboards.home",
+      id: "dashboards.beranda",
       path: path(ROOT_DASHBOARDS, "/home"),
       type: NAV_TYPE_ITEM,
-      title: "Home",
-      transKey: "nav.dashboards.home",
+      title: "Beranda",
+      transKey: "nav.dashboards.beranda",
       Icon: HomeIcon,
     },
     {
@@ -40,14 +40,14 @@ export const dashboards = {
       id:"dashboards.inputharga",
       path: path(ROOT_DASHBOARDS,"/inputharga"),
       type: NAV_TYPE_ITEM,
-      title: "inputharga",
+      title: "Input Harga",
       transkey:"nav.dashboards.inputharga"
     },
     {
       id: "dashboards.bahanpokok",
       path: path(ROOT_DASHBOARDS,"/bahanpokok"),
       type: NAV_TYPE_ITEM,
-      title:"bahanpokok",
+      title:"Bahan Pokok",
       transkey:"nav.dashboards.bahanpokok"
     }
   ],

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 import API from "configs/api.config"; // Pastikan path ini benar sesuai struktur proyek Anda
 
 const HargaBapokTable = () => {
@@ -50,8 +51,13 @@ const HargaBapokTable = () => {
       setError("Gagal mengambil data harga bahan pokok.");
       console.error("Error fetching data:", err.response?.data || err.message);
       if (err.response?.status === 401) {
-        alert("Sesi Anda berakhir atau tidak sah. Silakan login kembali.");
-        // window.location.href = '/login';
+        Swal.fire({
+          icon: "error",
+          title: "Sesi Berakhir",
+          text: "Sesi Anda berakhir atau tidak sah. Silakan login kembali.",
+        }).then(() => {
+          // window.location.href = '/login';
+        });
       }
     } finally {
       setLoading(false);
@@ -96,9 +102,11 @@ const HargaBapokTable = () => {
       !formData.harga ||
       !formData.stok
     ) {
-      alert(
-        "Pastikan semua data (Pasar, Bahan Pokok, Tanggal, Harga, Stok) terisi.",
-      );
+      Swal.fire({
+        icon: "warning",
+        title: "Input Tidak Lengkap",
+        text: "Pastikan semua data (Pasar, Bahan Pokok, Tanggal, Harga, Stok) terisi.",
+      });
       return;
     }
 
@@ -110,19 +118,23 @@ const HargaBapokTable = () => {
       };
 
       if (modalType === "add") {
-        const response = await axios.post(API.HARGA_BAPOK.STORE, formData, {
+        await axios.post(API.HARGA_BAPOK.STORE, formData, {
           headers,
         });
-        alert("Data berhasil ditambahkan!");
-        console.log("Respon tambah data:", response.data);
+        Swal.fire({
+          icon: "success",
+          title: "Berhasil!",
+          text: "Data berhasil ditambahkan!",
+        });
       } else {
-        const response = await axios.put(
-          API.HARGA_BAPOK.UPDATE(formData.id),
-          formData,
-          { headers },
-        );
-        alert("Data berhasil diperbarui!");
-        console.log("Respon update data:", response.data);
+        await axios.put(API.HARGA_BAPOK.UPDATE(formData.id), formData, {
+          headers,
+        });
+        Swal.fire({
+          icon: "success",
+          title: "Berhasil!",
+          text: "Data berhasil diperbarui!",
+        });
       }
 
       setShowModal(false);
@@ -142,10 +154,13 @@ const HargaBapokTable = () => {
         "Gagal menyimpan data:",
         error.response?.data || error.message,
       );
-      alert(
-        error.response?.data?.message ||
+      Swal.fire({
+        icon: "error",
+        title: "Gagal",
+        text:
+          error.response?.data?.message ||
           "Terjadi kesalahan saat menyimpan data.",
-      );
+      });
       if (error.response?.status === 401) {
         // window.location.href = '/login';
       }
@@ -155,12 +170,14 @@ const HargaBapokTable = () => {
   };
 
   const handleAddClick = () => {
+    const today = new Date().toISOString().split("T")[0];
+
     setModalType("add");
     setFormData({
       id: null,
       id_pasar: "",
       id_bahan_pokok: "",
-      tanggal: "",
+      tanggal: today,
       harga: "",
       stok: "",
       status_integrasi: "offline",
@@ -183,30 +200,58 @@ const HargaBapokTable = () => {
   };
 
   const handleDeleteClick = async (id) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus data ini?")) {
-      setLoading(true);
-      try {
-        const token = localStorage.getItem("authToken");
-        await axios.delete(API.HARGA_BAPOK.DELETE(id), {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        alert("Data berhasil dihapus!");
-        fetchDataHarga();
-      } catch (err) {
-        alert("Gagal menghapus data.");
-        console.error(
-          "Error deleting data:",
-          err.response?.data || err.message,
-        );
-        if (err.response?.status === 401) {
-          // window.location.href = '/login';
+    Swal.fire({
+      title: "Apakah Anda yakin?",
+      text: "Data yang dihapus tidak dapat dikembalikan!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        setLoading(true);
+        try {
+          const token = localStorage.getItem("authToken");
+          await axios.delete(API.HARGA_BAPOK.DELETE(id), {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          Swal.fire({
+            icon: "success",
+            title: "Dihapus!",
+            text: "Data berhasil dihapus.",
+          });
+          fetchDataHarga();
+        } catch (err) {
+          Swal.fire({
+            icon: "error",
+            title: "Gagal",
+            text: "Gagal menghapus data.",
+          });
+          console.error(
+            "Error deleting data:",
+            err.response?.data || err.message,
+          );
+          if (err.response?.status === 401) {
+            // window.location.href = '/login';
+          }
+        } finally {
+          setLoading(false);
         }
-      } finally {
-        setLoading(false);
       }
-    }
+    });
+  };
+
+  const formatRupiah = (value) => {
+    if (!value) return "";
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
+
+  const unformatRupiah = (value) => {
+    return value.replace(/\./g, "").replace(/\D/g, "");
   };
 
   // Pagination logic
@@ -427,7 +472,7 @@ const HargaBapokTable = () => {
 
       {/* Enhanced Modal Tambah/Edit */}
       {showModal && (
-        <div className="bg-opacity-75 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
+        <div className="bg-opacity-75 fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
           <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-gray-800 shadow-2xl">
             {/* Modal Header */}
             <div className="rounded-t-xl border-b border-gray-600 bg-gray-700 px-6 py-4">
@@ -522,12 +567,17 @@ const HargaBapokTable = () => {
                     Harga (Rp) <span className="text-red-400">*</span>
                   </label>
                   <input
-                    type="number"
+                    type="text"
                     name="harga"
-                    value={formData.harga}
-                    onChange={handleChange}
+                    value={formatRupiah(formData.harga)}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        harga: unformatRupiah(e.target.value),
+                      }))
+                    }
                     className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    placeholder="0"
+                    placeholder="Masukkan harga"
                     required
                   />
                 </div>

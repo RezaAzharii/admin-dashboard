@@ -1,5 +1,5 @@
 // Local Imports
-import Logo from "assets/appLogo.svg?react";
+import Logo from "assets/Bantul3.svg?react";
 import { Progress } from "components/ui";
 
 // ----------------------------------------------------------------------

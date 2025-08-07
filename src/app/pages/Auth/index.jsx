@@ -4,7 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 
 // Local Imports
-import Logo from "assets/appLogo.svg?react";
+import Logo from "assets/bantul3.svg";
 import { Button, Card, Input, InputErrorMsg } from "components/ui";
 import { useAuthContext } from "app/contexts/auth/context";
 import { schema } from "./schema";
@@ -39,14 +39,14 @@ export default function SignIn() {
       <main className="min-h-100vh grid w-full grow grid-cols-1 place-items-center">
         <div className="w-full max-w-[26rem] p-4 sm:px-5">
           <div className="text-center">
-            <Logo className="mx-auto size-16" />
+            <div className="mx-auto w-40 h-40 sm:w-[120px] sm:h-[100px] flex items-center justify-center">
+              
+              <img src={Logo} alt="Logo" className="w-full h-full object-contain" />
+            </div> 
             <div className="mt-4">
               <h2 className="text-2xl font-semibold text-gray-600 dark:text-dark-100">
-                Welcome Back
+                Selamat Datang
               </h2>
-              <p className="text-gray-400 dark:text-dark-300">
-                Please sign in to continue
-              </p>
             </div>
           </div>
 
@@ -55,7 +55,7 @@ export default function SignIn() {
               <div className="space-y-4">
                 <Input
                   label="Email"
-                  placeholder="Enter your email"
+                  placeholder="Masukkan email kamu"
                   prefix={
                     <EnvelopeIcon
                       className="size-5 transition-colors duration-200"
@@ -68,7 +68,7 @@ export default function SignIn() {
 
                 <Input
                   label="Password"
-                  placeholder="Enter your password"
+                  placeholder="Masukkan password kamu"
                   type="password"
                   prefix={
                     <LockClosedIcon
@@ -90,7 +90,7 @@ export default function SignIn() {
               </div>
 
               <Button type="submit" className="mt-5 w-full" color="primary">
-                Sign In
+                Masuk
               </Button>
             </form>
           </Card>

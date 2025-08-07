@@ -19,18 +19,20 @@ export function Sidebar() {
   const { isExpanded, close } = useSidebarContext();
   const { user, isInitialized } = useContext(AuthContext);
 
-  // Temukan segment aktif di awal (saat load pertama)
   const initialSegment = useMemo(
     () => navigation.find((item) => isRouteActive(item.path, pathname)),
-    [],
+    [pathname],
   );
-  const [activeSegmentPath, setActiveSegmentPath] = useState(initialSegment?.path);
+
+  const [activeSegmentPath, setActiveSegmentPath] = useState(
+    initialSegment?.path,
+  );
 
   // Filter navigation sesuai user
   const filteredNavigation = useMemo(() => {
     if (!isInitialized || !user) return [];
 
-    console.log("✅ Filtering navigation. user.is_admin:", user.is_admin);
+    // console.log("✅ Filtering navigation. user.is_admin:", user.is_admin);
 
     return navigation.map((segment) => {
       if (segment.id === "dashboards" && Array.isArray(segment.childs)) {
@@ -39,6 +41,10 @@ export function Sidebar() {
           childs: segment.childs.filter((child) => {
             // contoh: hanya admin yg boleh lihat daftar-petugas
             if (child.id === "dashboards.daftar-petugas") {
+              return !!user.is_admin;
+            }
+            // Hanya admin yang bisa lihat pasar
+            if (child.id === "dashboards.pasar") {
               return !!user.is_admin;
             }
             return true;
