@@ -323,19 +323,21 @@ export default function Home() {
   const alerts = generateAlerts();
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen bg-gray-50 p-6 dark:bg-gray-900">
       {/* Header */}
       <div className="mb-8">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
               {user?.is_admin
                 ? "Dashboard Admin"
                 : user?.is_petugas_pasar
                   ? "Dashboard Petugas Pasar"
                   : "Dashboard"}
             </h1>
-            <p className="text-gray-400">Sistem Monitoring Harga Bahan Pokok</p>
+            <p className="text-gray-600 dark:text-gray-400">
+              Sistem Monitoring Harga Bahan Pokok
+            </p>
           </div>
           <div className="text-right">
             <div className="flex justify-end">
@@ -347,11 +349,13 @@ export default function Home() {
                 Refresh
               </button>
             </div>
-            <p className="text-sm text-gray-400">Waktu Server</p>
-            <p className="text-lg font-semibold text-white">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Waktu Server
+            </p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-white">
               {currentTime.toLocaleTimeString("id-ID")}
             </p>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               {currentTime.toLocaleDateString("id-ID", {
                 weekday: "long",
                 year: "numeric",
@@ -367,14 +371,14 @@ export default function Home() {
           {stats.map((stat, index) => (
             <div
               key={index}
-              className="rounded-xl border border-gray-800 bg-gray-900 p-6 shadow-sm"
+              className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900 dark:shadow-none"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-400">
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                     {stat.title}
                   </p>
-                  <p className="mt-2 text-3xl font-bold text-white">
+                  <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
                     {stat.value}
                   </p>
                 </div>
@@ -390,30 +394,32 @@ export default function Home() {
       {/* Alert Section */}
       {alerts.length > 0 && (
         <div className="mb-8">
-          <h2 className="mb-4 text-xl font-semibold text-white">Notifikasi</h2>
+          <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
+            Notifikasi
+          </h2>
           <div className="space-y-3">
             {alerts.map((alert, index) => (
               <div
                 key={index}
                 className={`rounded-lg border-l-4 p-4 ${
                   alert.type === "warning"
-                    ? "border-yellow-500 bg-yellow-900"
+                    ? "border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20"
                     : alert.type === "info"
-                      ? "border-blue-500 bg-blue-900"
-                      : "border-green-500 bg-green-900"
+                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                      : "border-green-500 bg-green-50 dark:bg-green-900/20"
                 }`}
               >
                 <div className="flex items-center">
                   <AlertTriangle
                     className={`mr-3 h-5 w-5 ${
                       alert.type === "warning"
-                        ? "text-yellow-400"
+                        ? "text-yellow-600 dark:text-yellow-400"
                         : alert.type === "info"
-                          ? "text-blue-400"
-                          : "text-green-400"
+                          ? "text-blue-600 dark:text-blue-400"
+                          : "text-green-600 dark:text-green-400"
                     }`}
                   />
-                  <p className="text-sm font-medium text-white">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">
                     {alert.message}
                   </p>
                 </div>
@@ -427,8 +433,8 @@ export default function Home() {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Harga Terkini */}
         <div className="lg:col-span-2">
-          <div className="mb-8 rounded-xl border border-gray-800 bg-gray-900 p-6 shadow-sm">
-            <h2 className="mb-6 text-xl font-semibold text-white">
+          <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900 dark:shadow-none">
+            <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">
               Harga Bahan Pokok Terkini
             </h2>
             <div className="space-y-4">
@@ -436,29 +442,31 @@ export default function Home() {
                 latestPrices.map((item, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between rounded-lg bg-gray-800 p-4"
+                    className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800"
                   >
                     <div className="flex items-center">
-                      <Package className="mr-3 h-8 w-8 text-gray-400" />
+                      <Package className="mr-3 h-8 w-8 text-gray-500 dark:text-gray-400" />
                       <div>
-                        <h3 className="font-medium text-white">{item.nama}</h3>
-                        <p className="text-sm text-gray-400">
+                        <h3 className="font-medium text-gray-900 dark:text-white">
+                          {item.nama}
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
                           per {item.satuan}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-lg font-semibold text-white">
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white">
                         Rp {parseInt(item.harga).toLocaleString("id-ID")}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-500 dark:text-gray-500">
                         {new Date(item.updated_at).toLocaleDateString("id-ID")}
                       </p>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="py-8 text-center text-gray-500">
+                <p className="py-8 text-center text-gray-500 dark:text-gray-400">
                   Tidak ada data harga tersedia
                 </p>
               )}
@@ -467,20 +475,34 @@ export default function Home() {
 
           {/* Grafik Tren Harga */}
           {chartData.length > 0 && (
-            <div className="rounded-xl border border-gray-800 bg-gray-900 p-6 shadow-sm">
-              <h2 className="mb-6 text-xl font-semibold text-white">
+            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900 dark:shadow-none">
+              <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">
                 Tren Harga Rata-rata
               </h2>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis dataKey="bulan" stroke="#9CA3AF" />
-                  <YAxis stroke="#9CA3AF" />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="currentColor"
+                    className="text-gray-300 dark:text-gray-600"
+                  />
+                  <XAxis
+                    dataKey="bulan"
+                    stroke="currentColor"
+                    className="text-gray-500 dark:text-gray-400"
+                  />
+                  <YAxis
+                    stroke="currentColor"
+                    className="text-gray-500 dark:text-gray-400"
+                  />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#1F2937",
-                      borderColor: "#374151",
+                      backgroundColor: "#FFFFFF",
+                      borderColor: "#E5E7EB",
+                      color: "#111827",
+                      borderRadius: "8px",
                     }}
+                    wrapperClassName="dark:[&>.recharts-tooltip-wrapper]:!bg-gray-800 dark:[&>.recharts-tooltip-wrapper]:!border-gray-600 dark:[&>.recharts-tooltip-wrapper]:!text-white"
                     formatter={(value) => [
                       `Rp ${value.toLocaleString("id-ID")}`,
                       "Harga Rata-rata",
@@ -501,8 +523,8 @@ export default function Home() {
         {/* Sidebar */}
         <div className="space-y-8">
           {/* Update Terbaru */}
-          <div className="rounded-xl border border-gray-800 bg-gray-900 p-6 shadow-sm">
-            <h2 className="mb-6 text-xl font-semibold text-white">
+          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900 dark:shadow-none">
+            <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">
               Update Terbaru
             </h2>
             <div className="space-y-4">
@@ -510,25 +532,27 @@ export default function Home() {
                 recentUpdates.map((update, index) => (
                   <div
                     key={index}
-                    className="flex items-start space-x-3 rounded-lg bg-gray-800 p-3"
+                    className="flex items-start space-x-3 rounded-lg border border-gray-100 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800"
                   >
-                    <Clock className="mt-0.5 h-5 w-5 text-gray-400" />
+                    <Clock className="mt-0.5 h-5 w-5 text-gray-500 dark:text-gray-400" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-white">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
                         {update.pasar}
                       </p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
                         {update.petugas} • {update.waktu}
                       </p>
-                      <p className="text-xs text-blue-400">{update.item}</p>
-                      <p className="text-xs font-medium text-green-400">
+                      <p className="text-xs text-blue-600 dark:text-blue-400">
+                        {update.item}
+                      </p>
+                      <p className="text-xs font-medium text-green-600 dark:text-green-400">
                         Rp {parseInt(update.harga).toLocaleString("id-ID")}
                       </p>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="py-4 text-center text-gray-500">
+                <p className="py-4 text-center text-gray-500 dark:text-gray-400">
                   Tidak ada update terbaru
                 </p>
               )}

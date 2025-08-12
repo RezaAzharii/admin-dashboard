@@ -1,5 +1,12 @@
 import { Fragment, useState, useEffect } from "react";
-import { Plus, MapPin, Building2, Image, ChevronLeft, ChevronRight  } from "lucide-react";
+import {
+  Plus,
+  MapPin,
+  Building2,
+  Image,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import Swal from "sweetalert2";
 import { Dialog, Transition } from "@headlessui/react";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
@@ -7,12 +14,14 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 const redIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconUrl:
+    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
-  shadowSize: [41, 41]
+  shadowSize: [41, 41],
 });
 
 delete L.Icon.Default.prototype._getIconUrl;
@@ -27,41 +36,42 @@ const BASE_URL = "http://127.0.0.1:8000";
 const showAlert = {
   success: (title, text = "") => {
     Swal.fire({
-      icon: 'success',
+      icon: "success",
       title: title,
       text: text,
-      showConfirmButton: false, 
-      timer: 3000 
+      showConfirmButton: false,
+      timer: 3000,
     });
   },
 
   error: (title, text = "") => {
     Swal.fire({
-      icon: 'error',
+      icon: "error",
       title: title,
       text: text,
-      confirmButtonText: 'OK', 
+      confirmButtonText: "OK",
       customClass: {
-        confirmButton: 'bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors'
-      }
+        confirmButton:
+          "bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors",
+      },
     });
   },
 
   confirm: (title, text = "") => {
     return new Promise((resolve) => {
       Swal.fire({
-        icon: 'warning',
+        icon: "warning",
         title: title,
         text: text,
         showCancelButton: true,
-        confirmButtonColor: '#dc2626', 
-        cancelButtonColor: '#d1d5db', 
-        confirmButtonText: 'Hapus',
-        cancelButtonText: 'Batal',
+        confirmButtonColor: "#dc2626",
+        cancelButtonColor: "#d1d5db",
+        confirmButtonText: "Hapus",
+        cancelButtonText: "Batal",
         reverseButtons: true,
         customClass: {
-          cancelButton: 'text-gray-700'
-        }
+          cancelButton: "text-gray-700",
+        },
       }).then((result) => {
         resolve(result.isConfirmed);
       });
@@ -71,7 +81,7 @@ const showAlert = {
 
 const MarketFormModal = ({
   open,
-  onClose,  
+  onClose,
   refreshData,
   initialData = null,
   isEdit = false,
@@ -279,7 +289,10 @@ const MarketFormModal = ({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/70" aria-hidden="true" />
+          <div
+            className="fixed inset-0 bg-black/75 dark:bg-black/85"
+            aria-hidden="true"
+          />
         </Transition.Child>
 
         <div className="fixed inset-0 flex items-center justify-center overflow-y-auto p-4">
@@ -292,9 +305,9 @@ const MarketFormModal = ({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <Dialog.Panel className="max-h-[95vh] w-full max-w-3xl overflow-y-auto rounded-xl bg-white shadow-2xl dark:bg-gray-800">
+            <Dialog.Panel className="max-h-[95vh] w-full max-w-3xl overflow-y-auto rounded-xl bg-white shadow-2xl dark:bg-gray-900 dark:shadow-gray-700/50">
               <div className="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
-                <Dialog.Title className="text-xl font-semibold text-gray-900 dark:text-white">
+                <Dialog.Title className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                   {isEdit ? "Edit Data Pasar" : "Tambah Data Pasar"}
                 </Dialog.Title>
                 <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
@@ -307,20 +320,21 @@ const MarketFormModal = ({
               <div className="space-y-6 px-6 py-6">
                 {/* Basic Information Section */}
                 <div>
-                  <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-white">
+                  <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">
                     Informasi Dasar
                   </h3>
                   {/* Nama Pasar - Made Full Width */}
                   <div className="w-full">
                     <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Nama Pasar <span className="text-red-500">*</span>
+                      Nama Pasar{" "}
+                      <span className="text-red-500 dark:text-red-400">*</span>
                     </label>
                     <input
                       name="nama"
                       value={formData.nama}
                       onChange={handleChange}
                       required
-                      className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
                       placeholder="Masukkan nama lengkap pasar (contoh: Pasar Tradisional Bantul Kota)"
                     />
                   </div>
@@ -328,7 +342,7 @@ const MarketFormModal = ({
 
                 {/* Location Section */}
                 <div>
-                  <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-white">
+                  <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">
                     Lokasi Pasar
                   </h3>
 
@@ -342,7 +356,7 @@ const MarketFormModal = ({
                       readOnly
                       onClick={() => setShowSearch((prev) => !prev)}
                       placeholder="Klik untuk pilih lokasi di peta"
-                      className="w-full cursor-pointer rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-gray-700 hover:bg-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
+                      className="w-full cursor-pointer rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-gray-700 placeholder-gray-500 hover:bg-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400 dark:hover:bg-gray-600 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
                     />
                   </div>
 
@@ -354,20 +368,20 @@ const MarketFormModal = ({
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                           placeholder="Cari lokasi (contoh: Pasar Bantul)"
-                          className="flex-1 rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                          className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
                           onKeyPress={(e) =>
                             e.key === "Enter" && handleSearch()
                           }
                         />
                         <button
                           onClick={handleSearch}
-                          className="rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                          className="rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-400 dark:focus:ring-offset-gray-900"
                         >
                           Cari
                         </button>
                       </div>
 
-                      <div className="overflow-hidden rounded-lg border border-gray-300">
+                      <div className="overflow-hidden rounded-lg border border-gray-300 dark:border-gray-600">
                         <MapContainer
                           center={position || [-7.8881, 110.3288]}
                           zoom={13}
@@ -380,7 +394,9 @@ const MarketFormModal = ({
                         >
                           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                           <MapClickHandler />
-                          {position && <Marker position={position} icon={redIcon}/>}
+                          {position && (
+                            <Marker position={position} icon={redIcon} />
+                          )}
                         </MapContainer>
                       </div>
 
@@ -394,7 +410,7 @@ const MarketFormModal = ({
                             value={formData.latitude}
                             readOnly
                             placeholder="Latitude"
-                            className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-gray-700 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+                            className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-gray-700 placeholder-gray-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
                           />
                         </div>
                         <div>
@@ -406,7 +422,7 @@ const MarketFormModal = ({
                             value={formData.longitude}
                             readOnly
                             placeholder="Longitude"
-                            className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-gray-700 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+                            className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-gray-700 placeholder-gray-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
                           />
                         </div>
                       </div>
@@ -416,7 +432,7 @@ const MarketFormModal = ({
 
                 {/* Market Details Section */}
                 <div>
-                  <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-white">
+                  <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">
                     Detail Pasar
                   </h3>
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -430,7 +446,7 @@ const MarketFormModal = ({
                         value={formData.jumlah_pedagang}
                         onChange={handleChange}
                         placeholder="0"
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                        className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
                       />
                     </div>
 
@@ -444,7 +460,7 @@ const MarketFormModal = ({
                         value={formData.jumlah_kios}
                         onChange={handleChange}
                         placeholder="0"
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                        className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
                       />
                     </div>
 
@@ -458,7 +474,7 @@ const MarketFormModal = ({
                         value={formData.jumlah_mck}
                         onChange={handleChange}
                         placeholder="0"
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                        className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
                       />
                     </div>
 
@@ -472,7 +488,7 @@ const MarketFormModal = ({
                         value={formData.jumlah_bango}
                         onChange={handleChange}
                         placeholder="0"
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                        className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
                       />
                     </div>
 
@@ -486,7 +502,7 @@ const MarketFormModal = ({
                         value={formData.jumlah_kantor}
                         onChange={handleChange}
                         placeholder="0"
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                        className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
                       />
                     </div>
 
@@ -500,7 +516,7 @@ const MarketFormModal = ({
                         value={formData.tps}
                         onChange={handleChange}
                         placeholder="Tempat Pembuangan Sampah"
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                        className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
                       />
                     </div>
                   </div>
@@ -508,7 +524,7 @@ const MarketFormModal = ({
 
                 {/* Additional Information Section */}
                 <div>
-                  <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-white">
+                  <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">
                     Informasi Tambahan
                   </h3>
                   <div>
@@ -521,14 +537,14 @@ const MarketFormModal = ({
                       onChange={handleChange}
                       rows={3}
                       placeholder="Masukkan keterangan tambahan..."
-                      className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
                     />
                   </div>
                 </div>
 
                 {/* Photo Upload Section */}
                 <div>
-                  <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-white">
+                  <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">
                     Foto Pasar
                   </h3>
 
@@ -541,7 +557,7 @@ const MarketFormModal = ({
                         <img
                           src={`http://127.0.0.1:8000${currentPhoto}`}
                           alt="Foto Pasar"
-                          className="h-32 w-32 rounded-lg border border-gray-300 object-cover"
+                          className="h-32 w-32 rounded-lg border border-gray-300 object-cover dark:border-gray-600"
                         />
                       </div>
                     </div>
@@ -558,7 +574,7 @@ const MarketFormModal = ({
                       name="foto"
                       accept="image/*"
                       onChange={handleChange}
-                      className="block w-full rounded-lg border border-gray-300 text-sm text-gray-500 file:mr-4 file:cursor-pointer file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-blue-700 hover:file:bg-blue-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400 dark:file:bg-gray-600 dark:file:text-gray-300"
+                      className="block w-full rounded-lg border border-gray-300 bg-white text-sm text-gray-500 file:mr-4 file:cursor-pointer file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-blue-700 hover:file:bg-blue-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:file:bg-blue-900/50 dark:file:text-blue-300 dark:hover:file:bg-blue-900/70"
                     />
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                       Format: JPG, PNG, GIF. Maksimal 5MB.
@@ -572,13 +588,13 @@ const MarketFormModal = ({
                 <div className="flex justify-end space-x-3">
                   <button
                     onClick={onClose}
-                    className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                    className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:ring-gray-400 dark:focus:ring-offset-gray-900"
                   >
                     Batal
                   </button>
                   <button
                     onClick={handleFormSubmit}
-                    className="rounded-lg border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                    className="rounded-lg border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-400 dark:focus:ring-offset-gray-900"
                   >
                     {isEdit ? "Update Data" : "Simpan Data"}
                   </button>
@@ -760,20 +776,18 @@ const Pasar = () => {
   };
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen px-6 pt-5 ">
       <div className="mx-auto max-w-7xl">
-
-        
         <div className="mb-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-[30px] font-semibold text-white">
-                Kelola data pasar 
+              <h1 className="text-[30px] font-semibold text-gray-900 dark:text-gray-100">
+                Kelola data pasar
               </h1>
             </div>
             <button
               onClick={handleAdd}
-              className="inline-flex transform items-center rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-blue-500 hover:to-blue-600 hover:shadow-xl"
+              className="inline-flex transform items-center rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-blue-500 hover:to-blue-600 hover:shadow-xl dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-400 dark:hover:to-blue-500"
             >
               <Plus className="mr-2" size={20} />
               Tambah Pasar
@@ -781,17 +795,15 @@ const Pasar = () => {
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-2xl border border-gray-700/50 bg-gray-800/50 shadow-2xl backdrop-blur-sm">
-          
-
+        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800">
           {/* Pagination Controls - Top */}
-          <div className="flex items-center justify-between px-6 py-4">
-            <div className="flex items-center text-gray-300">
+          <div className="flex items-center justify-between px-6 py-4 bg-gray-50 border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+            <div className="flex items-center text-gray-700 dark:text-gray-300">
               <span className="mr-2">Tampilkan</span>
               <select
                 value={itemsPerPage}
                 onChange={handleItemsPerPageChange}
-                className="rounded-md border p-1 border-gray-600 bg-gray-700 text-white focus:border-blue-500 focus:ring-blue-500"
+                className="rounded-md border border-gray-300 bg-white p-2 text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
               >
                 <option value="5">5</option>
                 <option value="10">10</option>
@@ -804,36 +816,36 @@ const Pasar = () => {
 
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-900/80">
+              <thead className="bg-gray-100 dark:bg-gray-900">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-300 uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase dark:text-gray-400">
                     No
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-300 uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase dark:text-gray-400">
                     Foto
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-300 uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase dark:text-gray-400">
                     Nama Pasar
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-300 uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase dark:text-gray-400">
                     Alamat
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-300 uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase dark:text-gray-400">
                     Keterangan
                   </th>
-                  <th className="px-6 py-4 text-center text-xs font-semibold tracking-wider text-gray-300 uppercase">
+                  <th className="px-6 py-4 text-center text-xs font-semibold tracking-wider text-gray-600 uppercase dark:text-gray-400">
                     Aksi
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-700/50">
+              <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
                 {currentPasars.map((pasar, index) => (
                   <tr
                     key={pasar.id}
-                    className="group transition-all duration-200 hover:bg-gray-700/30"
+                    className="group transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
                   >
                     <td className="px-6 py-4">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600/20 text-sm font-semibold text-blue-400">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
                         {(currentPage - 1) * itemsPerPage + index + 1}
                       </div>
                     </td>
@@ -842,31 +854,31 @@ const Pasar = () => {
                         <img
                           src={`${BASE_URL}${pasar.foto}`}
                           alt="Foto Pasar"
-                          className="h-16 w-16 rounded-xl border-2 border-gray-600 object-cover shadow-lg"
+                          className="h-16 w-16 rounded-xl border-2 border-gray-200 object-cover shadow-md dark:border-gray-600"
                         />
                       ) : (
-                        <div className="flex h-16 w-16 items-center justify-center rounded-xl border-2 border-gray-600 bg-gradient-to-br from-gray-600 to-gray-700">
-                          <Image className="h-6 w-6 text-gray-400" />
+                        <div className="flex h-16 w-16 items-center justify-center rounded-xl border-2 border-gray-200 bg-gradient-to-br from-gray-100 to-gray-200 dark:border-gray-600 dark:from-gray-600 dark:to-gray-700">
+                          <Image className="h-6 w-6 text-gray-400 dark:text-gray-500" />
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm font-semibold text-white">
+                    <td className="px-6 py-4 text-sm font-semibold text-gray-900 dark:text-gray-100">
                       <div className="max-w-xs">
                         <p className="truncate" title={pasar.nama}>
                           {pasar.nama}
                         </p>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-300">
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
                       <div className="flex max-w-sm items-start">
-                        <MapPin className="mt-0.5 mr-2 h-4 w-4 flex-shrink-0 text-gray-400" />
+                        <MapPin className="mt-0.5 mr-2 h-4 w-4 flex-shrink-0 text-gray-400 dark:text-gray-500" />
                         <span className="truncate" title={pasar.alamat}>
                           {pasar.alamat}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="inline-flex items-center rounded-full border border-green-700/50 bg-green-900/30 px-3 py-1 text-xs font-medium text-green-400">
+                      <div className="inline-flex items-center rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-700 dark:border-green-800 dark:bg-green-900/30 dark:text-green-300">
                         {pasar.keterangan}
                       </div>
                     </td>
@@ -874,17 +886,17 @@ const Pasar = () => {
                       <div className="flex items-center justify-center space-x-3">
                         <button
                           onClick={() => handleEdit(pasar)}
-                          className="inline-flex px-10 h-8 w-8 items-center justify-center rounded-lg bg-yellow-600/20 text-yellow-400 transition-all duration-200 group-hover:scale-110 hover:bg-yellow-600/30 hover:text-yellow-300"
+                          className="inline-flex h-10 items-center justify-center rounded-lg bg-yellow-50 px-4 py-2 text-sm font-medium text-yellow-700 transition-all duration-200 hover:bg-yellow-100 group-hover:scale-105 dark:bg-yellow-900/30 dark:text-yellow-300 dark:hover:bg-yellow-900/50"
                           title="Edit"
                         >
-                          edit
+                          Edit
                         </button>
                         <button
                           onClick={() => handleDelete(pasar.id)}
-                          className="inline-flex px-10 h-8 w-8 items-center justify-center rounded-lg bg-red-600/20 text-red-400 transition-all duration-200 group-hover:scale-110 hover:bg-red-600/30 hover:text-red-300"
+                          className="inline-flex h-10 items-center justify-center rounded-lg bg-red-50 px-4 py-2 text-sm font-medium text-red-700 transition-all duration-200 hover:bg-red-100 group-hover:scale-105 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50"
                           title="Hapus"
                         >
-                          hapus
+                          Hapus
                         </button>
                       </div>
                     </td>
@@ -895,17 +907,17 @@ const Pasar = () => {
           </div>
 
           {pasars.length === 0 && (
-            <div className="py-12 text-center">
-              <Building2 className="mx-auto mb-4 h-16 w-16 text-gray-500" />
-              <h3 className="mb-2 text-lg font-semibold text-gray-400">
+            <div className="py-12 text-center bg-white dark:bg-gray-800">
+              <Building2 className="mx-auto mb-4 h-16 w-16 text-gray-400 dark:text-gray-500" />
+              <h3 className="mb-2 text-lg font-semibold text-gray-700 dark:text-gray-300">
                 Belum ada data pasar
               </h3>
-              <p className="mb-6 text-gray-500">
+              <p className="mb-6 text-gray-500 dark:text-gray-400">
                 Mulai dengan menambahkan pasar pertama Anda
               </p>
               <button
                 onClick={handleAdd}
-                className="inline-flex items-center rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-blue-500"
+                className="inline-flex items-center rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
               >
                 <Plus className="mr-2" size={18} />
                 Tambah Pasar
@@ -915,17 +927,17 @@ const Pasar = () => {
 
           {/* Pagination Controls - Bottom */}
           {pasars.length > 0 && (
-            <div className="flex items-center justify-between border-t border-gray-700/50 px-6 py-4">
-              <div className="text-sm text-gray-400">
+            <div className="flex items-center justify-between border-t border-gray-200 bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-800">
+              <div className="text-sm text-gray-600 dark:text-gray-400">
                 Menampilkan {indexOfFirstItem + 1} -{" "}
-                {Math.min(indexOfLastItem, pasars.length)} dari{" "}
-                {pasars.length} data
+                {Math.min(indexOfLastItem, pasars.length)} dari {pasars.length}{" "}
+                data
               </div>
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="rounded-md bg-gray-700 px-3 py-3 text-white hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-md bg-white border border-gray-300 px-3 py-2 text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600"
                 >
                   <ChevronLeft size={16} />
                 </button>
@@ -933,10 +945,10 @@ const Pasar = () => {
                   <button
                     key={i + 1}
                     onClick={() => handlePageChange(i + 1)}
-                    className={`inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium ${
+                    className={`inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium transition-colors ${
                       currentPage === i + 1
-                        ? "bg-blue-600 text-white"
-                        : "border border-gray-600 bg-gray-700 text-gray-300 hover:bg-gray-600"
+                        ? "bg-blue-600 text-white dark:bg-blue-500"
+                        : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                     }`}
                   >
                     {i + 1}
@@ -945,7 +957,7 @@ const Pasar = () => {
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="rounded-md bg-gray-700 px-3 py-3 text-white hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-md bg-white border border-gray-300 px-3 py-2 text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600"
                 >
                   <ChevronRight size={16} />
                 </button>
@@ -962,7 +974,7 @@ const Pasar = () => {
         initialData={selectedPasar}
         isEdit={isEdit}
         onSubmit={handleSubmit}
-        refreshData={loadPasars} // This prop is not directly used in the provided MarketFormModal but kept for context
+        refreshData={loadPasars}
       />
     </div>
   );

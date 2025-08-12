@@ -1,25 +1,28 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import API from "configs/api.config"; // Pastikan path ini benar sesuai struktur proyek Anda
+import API from "configs/api.config";
+import AuthContext from "app/contexts/auth/authContext";
+import { useContext } from "react";
 
 const HargaBapokTable = () => {
+  const { user: currentUser } = useContext(AuthContext);
   const [dataHarga, setDataHarga] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState("add"); // 'add' or 'edit'
+  const [modalType, setModalType] = useState("add");
   const [formData, setFormData] = useState({
     id: null,
     id_pasar: "",
     id_bahan_pokok: "",
     tanggal: "",
     harga: "",
+    harga_baru: "",
     stok: "",
-    status_integrasi: "offline", // Default value
+    status_integrasi: "offline",
   });
 
-  // State untuk menyimpan daftar Pasar dan Bahan Pokok untuk dropdown di modal
   const [listPasar, setListPasar] = useState([]);
   const [listBahanPokok, setListBahanPokok] = useState([]);
 
@@ -27,11 +30,34 @@ const HargaBapokTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [filteredData, setFilteredData] = useState([]);
+  const [hargaError, setHargaError] = useState("");
+  // Tambahkan ini di awal komponen jika belum ada
+  const [formError, setFormError] = useState({
+    harga_baru: "",
+  });
+  const [hargaSebelumnya, setHargaSebelumnya] = useState("0");
 
   useEffect(() => {
-    fetchDataHarga();
-    fetchListDependencies(); // Memuat daftar pasar dan bahan pokok saat komponen dimuat
-  }, []);
+    if (currentUser && dataHarga.length > 0) {
+      // Filter manual jika backend tidak memfilter dengan benar
+      const filtered = currentUser?.is_petugas_pasar
+        ? dataHarga.filter((item) => item.id_pasar == currentUser.id_pasar)
+        : dataHarga;
+
+      setFilteredData(filtered);
+      // console.log("Filtered data:", filtered);
+    } else {
+      setFilteredData(dataHarga);
+    }
+  }, [dataHarga, currentUser]);
+
+  useEffect(() => {
+    if (currentUser) {
+      // console.log("Current user from AuthContext:", currentUser);
+      fetchDataHarga();
+      fetchListDependencies();
+    }
+  }, [currentUser]);
 
   useEffect(() => {
     setFilteredData(dataHarga);
@@ -40,12 +66,24 @@ const HargaBapokTable = () => {
   const fetchDataHarga = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("authToken"); // Ambil token dari localStorage
-      const response = await axios.get(API.HARGA_BAPOK.INDEX, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const token = localStorage.getItem("authToken");
+
+      let url = API.HARGA_BAPOK.INDEX;
+      let params = {};
+
+      if (currentUser?.is_petugas_pasar && currentUser.id_pasar) {
+        params.id_pasar = currentUser.id_pasar;
+        // console.log(
+        //   `Fetching data for pasar ${currentUser.id_pasar} (${currentUser.name})`,
+        // );
+      }
+
+      const response = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+        params, // Kirim parameter filter
       });
+
+      // console.log("Data received:", response.data);
       setDataHarga(response.data);
     } catch (err) {
       setError("Gagal mengambil data harga bahan pokok.");
@@ -55,8 +93,6 @@ const HargaBapokTable = () => {
           icon: "error",
           title: "Sesi Berakhir",
           text: "Sesi Anda berakhir atau tidak sah. Silakan login kembali.",
-        }).then(() => {
-          // window.location.href = '/login';
         });
       }
     } finally {
@@ -83,13 +119,19 @@ const HargaBapokTable = () => {
         "Gagal mengambil daftar pasar atau bahan pokok:",
         err.response?.data || err.message,
       );
-      // Anda bisa menambahkan penanganan error yang lebih spesifik jika diperlukan
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const checkExistingData = (id_pasar, id_bahan_pokok) => {
+    return dataHarga.find(
+      (item) =>
+        item.id_pasar == id_pasar && item.id_bahan_pokok == id_bahan_pokok,
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -113,14 +155,37 @@ const HargaBapokTable = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("authToken");
-      const headers = {
-        Authorization: `Bearer ${token}`,
-      };
+      const headers = { Authorization: `Bearer ${token}` };
 
       if (modalType === "add") {
-        await axios.post(API.HARGA_BAPOK.STORE, formData, {
-          headers,
-        });
+        const existingData = checkExistingData(
+          formData.id_pasar,
+          formData.id_bahan_pokok,
+        );
+
+        if (existingData) {
+          Swal.fire({
+            icon: "warning",
+            title: "Data Sudah Ada",
+            html: `Data untuk bahan pokok ini di pasar ini sudah ada.<br><br>
+            Apakah Anda ingin mengedit data yang sudah ada?`,
+            showCancelButton: true,
+            confirmButtonText: "Ya, Edit Data",
+            cancelButtonText: "Tidak",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              handleEditClick(existingData);
+            } else {
+              setShowModal(false);
+            }
+          });
+          setLoading(false);
+          return;
+        }
+      }
+
+      if (modalType === "add") {
+        await axios.post(API.HARGA_BAPOK.STORE, formData, { headers });
         Swal.fire({
           icon: "success",
           title: "Berhasil!",
@@ -144,6 +209,7 @@ const HargaBapokTable = () => {
         id_bahan_pokok: "",
         tanggal: "",
         harga: "",
+        harga_baru: "",
         stok: "",
         status_integrasi: "offline",
       });
@@ -161,9 +227,6 @@ const HargaBapokTable = () => {
           error.response?.data?.message ||
           "Terjadi kesalahan saat menyimpan data.",
       });
-      if (error.response?.status === 401) {
-        // window.location.href = '/login';
-      }
     } finally {
       setLoading(false);
     }
@@ -175,10 +238,13 @@ const HargaBapokTable = () => {
     setModalType("add");
     setFormData({
       id: null,
-      id_pasar: "",
+      id_pasar: currentUser?.is_petugas_pasar
+        ? currentUser.id_pasar.toString()
+        : "",
       id_bahan_pokok: "",
       tanggal: today,
       harga: "",
+      harga_baru: "",
       stok: "",
       status_integrasi: "offline",
     });
@@ -186,16 +252,19 @@ const HargaBapokTable = () => {
   };
 
   const handleEditClick = (item) => {
+    const today = new Date().toISOString().split("T")[0];
     setModalType("edit");
     setFormData({
       id: item.id,
       id_pasar: item.id_pasar,
       id_bahan_pokok: item.id_bahan_pokok,
-      tanggal: item.tanggal.split("T")[0],
+      tanggal: today,
       harga: item.harga,
+      harga_baru: "",
       stok: item.stok,
       status_integrasi: item.status_integrasi,
     });
+    setHargaSebelumnya(item.harga_baru);
     setShowModal(true);
   };
 
@@ -339,8 +408,8 @@ const HargaBapokTable = () => {
 
   return (
     <div className="container mx-auto p-4 text-gray-100">
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-100">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="dark:text-dark-50 text-2xl font-bold text-gray-800">
           Daftar Harga Bahan Pokok
         </h2>
         <button
@@ -352,110 +421,140 @@ const HargaBapokTable = () => {
       </div>
 
       {/* Show entries selector */}
-      <div className="mb-4 flex items-center text-white">
+      <div className="dark:text-dark-50 mb-4 flex items-center text-gray-800">
         <span className="mr-2">Tampilkan</span>
         <select
           value={itemsPerPage}
           onChange={handleItemsPerPageChange}
-          className="rounded border border-gray-600 bg-gray-700 px-3 py-1 text-gray-100 focus:border-blue-500 focus:outline-none"
+          className="dark:text-dark-50 rounded border border-gray-600 bg-gray-50 dark:bg-gray-700 px-3 py-1 text-gray-800 focus:border-blue-500 focus:outline-none"
         >
           <option value={5}>5</option>
           <option value={10}>10</option>
           <option value={25}>25</option>
           <option value={50}>50</option>
         </select>
-        <span className="ml-2">data per halaman</span>
+        <span className="dark:text-dark-50 ml-2 text-gray-800">
+          data per halaman
+        </span>
       </div>
 
-      <div className="overflow-x-auto rounded-lg bg-gray-800 shadow-xl">
+      <div className="overflow-x-auto rounded-lg bg-white shadow-xl dark:bg-gray-800">
         <table className="min-w-full">
-          <thead className="bg-gray-700">
+          <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
-              <th className="border-b border-gray-600 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-300 uppercase">
+              <th className="border-b border-gray-200 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-700 uppercase dark:border-gray-600 dark:text-gray-300">
                 #
               </th>
-              <th className="border-b border-gray-600 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-300 uppercase">
+              <th className="border-b border-gray-200 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-700 uppercase dark:border-gray-600 dark:text-gray-300">
                 dibuat oleh
               </th>
-              <th className="border-b border-gray-600 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-300 uppercase">
+              <th className="border-b border-gray-200 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-700 uppercase dark:border-gray-600 dark:text-gray-300">
                 Pasar
               </th>
-              <th className="border-b border-gray-600 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-300 uppercase">
+              <th className="border-b border-gray-200 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-700 uppercase dark:border-gray-600 dark:text-gray-300">
                 Bahan Pokok
               </th>
-              <th className="border-b border-gray-600 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-300 uppercase">
+              <th className="border-b border-gray-200 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-700 uppercase dark:border-gray-600 dark:text-gray-300">
                 Tanggal
               </th>
-              <th className="border-b border-gray-600 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-300 uppercase">
+              <th className="border-b border-gray-200 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-700 uppercase dark:border-gray-600 dark:text-gray-300">
                 Harga
               </th>
-              <th className="border-b border-gray-600 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-300 uppercase">
+              <th className="border-b border-gray-200 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-700 uppercase dark:border-gray-600 dark:text-gray-300">
+                Harga Baru
+              </th>
+              <th className="border-b border-gray-200 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-700 uppercase dark:border-gray-600 dark:text-gray-300">
+                % Perubahan
+              </th>
+              <th className="border-b border-gray-200 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-700 uppercase dark:border-gray-600 dark:text-gray-300">
                 Stok
               </th>
-              <th className="border-b border-gray-600 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-300 uppercase">
+              <th className="border-b border-gray-200 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-700 uppercase dark:border-gray-600 dark:text-gray-300">
                 Status
               </th>
-              <th className="border-b border-gray-600 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-300 uppercase">
+              <th className="border-b border-gray-200 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-700 uppercase dark:border-gray-600 dark:text-gray-300">
                 Aksi
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-700">
-            {currentData.map((item, index) => (
-              <tr
-                key={item.id}
-                className="transition-colors duration-150 hover:bg-gray-700"
-              >
-                <td className="px-4 py-3 text-sm text-gray-300">
-                  {startIndex + index + 1}
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-300">
-                  {item.created_by || "-"}
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-300">
-                  {item.pasar ? item.pasar.nama : "N/A"}
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-300">
-                  {item.bahan_pokok ? item.bahan_pokok.nama : "N/A"}
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-300">
-                  {new Date(item.tanggal).toLocaleDateString("id-ID")}
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-300">
-                  Rp {parseFloat(item.harga).toLocaleString("id-ID")}
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-300">
-                  {item.stok} {item.bahan_pokok ? item.bahan_pokok.satuan : ""}
-                </td>
-                <td className="px-4 py-3 text-sm">
-                  <span
-                    className={`rounded-full px-2 py-1 text-xs font-medium ${
-                      item.status_integrasi === "online"
-                        ? "bg-green-800 text-green-200"
-                        : "bg-gray-600 text-gray-300"
-                    }`}
-                  >
-                    {item.status_integrasi}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-sm">
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handleEditClick(item)}
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-yellow-600/20 px-10 text-yellow-400 transition-all duration-200 group-hover:scale-110 hover:bg-yellow-600/30 hover:text-yellow-300"
+          <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+            {currentData.map((item, index) => {
+              // Debugging: Tampilkan warning jika ada data dari pasar lain
+              if (
+                currentUser?.is_petugas_pasar &&
+                item.id_pasar != currentUser.id_pasar
+              ) {
+                console.warn("Data tidak sesuai filter:", item);
+                return null;
+              }
+
+              return (
+                <tr
+                  key={item.id}
+                  className="transition-colors duration-150 hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+                    {startIndex + index + 1}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+                    {item.created_by || "-"}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+                    {item.pasar ? item.pasar.nama : "N/A"}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+                    {item.bahan_pokok ? item.bahan_pokok.nama : "N/A"}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+                    {new Date(item.tanggal).toLocaleDateString("id-ID")}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+                    Rp {parseFloat(item.harga).toLocaleString("id-ID")}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+                    {item.harga_baru
+                      ? `Rp ${parseFloat(item.harga_baru).toLocaleString("id-ID")}`
+                      : "-"}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+                    {item.harga_baru
+                      ? `${(((item.harga_baru - item.harga) / item.harga) * 100).toFixed(2)}%`
+                      : "0%"}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+                    {item.stok}{" "}
+                    {item.bahan_pokok ? item.bahan_pokok.satuan : ""}
+                  </td>
+                  <td className="px-4 py-3 text-sm">
+                    <span
+                      className={`rounded-full px-2 py-1 text-xs font-medium ${
+                        item.status_integrasi === "online"
+                          ? "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200"
+                          : "bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300"
+                      }`}
                     >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteClick(item.id)}
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-red-600/20 px-10 text-red-400 transition-all duration-200 group-hover:scale-110 hover:bg-red-600/30 hover:text-red-300"
-                    >
-                      Hapus
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+                      {item.status_integrasi}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-sm">
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleEditClick(item)}
+                        className="inline-flex h-8 items-center justify-center rounded-lg bg-yellow-100 px-3 text-yellow-800 transition-all duration-200 hover:bg-yellow-200 dark:bg-yellow-600/20 dark:text-yellow-400 dark:hover:bg-yellow-600/30 dark:hover:text-yellow-300"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(item.id)}
+                        className="inline-flex h-8 items-center justify-center rounded-lg bg-red-100 px-3 text-red-800 transition-all duration-200 hover:bg-red-200 dark:bg-red-600/20 dark:text-red-400 dark:hover:bg-red-600/30 dark:hover:text-red-300"
+                      >
+                        Hapus
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -516,6 +615,7 @@ const HargaBapokTable = () => {
                     onChange={handleChange}
                     className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     required
+                    disabled={currentUser?.is_petugas_pasar}
                   >
                     <option value="">Pilih Pasar</option>
                     {listPasar.map((pasar) => (
@@ -524,6 +624,9 @@ const HargaBapokTable = () => {
                       </option>
                     ))}
                   </select>
+                  {currentUser?.is_petugas_pasar && (
+                    <p className="mt-1 text-xs text-gray-400"></p>
+                  )}
                 </div>
 
                 <div>
@@ -563,24 +666,93 @@ const HargaBapokTable = () => {
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-sm font-semibold text-gray-300">
+                  <label className="mb-1 block text-sm font-semibold text-gray-300">
                     Harga (Rp) <span className="text-red-400">*</span>
                   </label>
+
+                  {modalType === "edit" && (
+                    <p className="mb-2 text-sm text-gray-400">
+                      Harga saat ini:{" "}
+                      <span className="font-semibold text-white">
+                        {formatRupiah(hargaSebelumnya || "0")}
+                      </span>
+                    </p>
+                  )}
+
                   <input
                     type="text"
                     name="harga"
                     value={formatRupiah(formData.harga)}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        harga: unformatRupiah(e.target.value),
-                      }))
-                    }
+                    onChange={(e) => {
+                      const value = unformatRupiah(e.target.value);
+                      const numericValue = parseInt(value, 10);
+
+                      if (numericValue === 0 || /^0[0-9]*$/.test(value)) {
+                        setHargaError("Harga tidak boleh diisi 0");
+                      } else {
+                        setHargaError("");
+                        setFormData((prev) => ({
+                          ...prev,
+                          harga: value,
+                        }));
+                      }
+                    }}
                     className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     placeholder="Masukkan harga"
                     required
                   />
+                  {hargaError && (
+                    <p className="mt-1 text-sm text-red-500">{hargaError}</p>
+                  )}
                 </div>
+
+                {modalType === "edit" && (
+                  <div>
+                    <label className="mb-1 block text-sm font-semibold text-gray-300">
+                      Harga Baru
+                    </label>
+                    <p className="mb-2 text-sm text-gray-400">
+                      Masukkan harga baru
+                    </p>
+                    <input
+                      type="text"
+                      name="harga_baru"
+                      value={formatRupiah(formData.harga_baru || "")}
+                      onChange={(e) => {
+                        const rawValue = unformatRupiah(e.target.value);
+                        const numericValue = parseInt(rawValue, 10);
+
+                        if (numericValue === 0 || /^0[0-9]*$/.test(rawValue)) {
+                          setFormError((prev) => ({
+                            ...prev,
+                            harga_baru: "Harga tidak boleh diisi 0",
+                          }));
+                        } else {
+                          setFormError((prev) => ({
+                            ...prev,
+                            harga_baru: "",
+                          }));
+                        }
+
+                        setFormData((prev) => ({
+                          ...prev,
+                          harga_baru: rawValue,
+                        }));
+                      }}
+                      className={`w-full rounded-lg border px-3 py-2 transition-all duration-150 focus:ring-2 focus:outline-none ${
+                        formError.harga_baru
+                          ? "border-red-500 bg-gray-700 text-red-400 focus:ring-red-500"
+                          : "border-gray-600 bg-gray-700 text-gray-100 focus:ring-blue-500"
+                      }`}
+                      placeholder="Masukkan harga baru"
+                    />
+                    {formError.harga_baru && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {formError.harga_baru}
+                      </p>
+                    )}
+                  </div>
+                )}
 
                 <div>
                   <label className="mb-2 block text-sm font-semibold text-gray-300">
