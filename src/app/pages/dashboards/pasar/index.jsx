@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import Swal from "sweetalert2";
 import { Dialog, Transition } from "@headlessui/react";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -31,6 +31,18 @@ L.Icon.Default.mergeOptions({
 });
 
 const BASE_URL = "http://127.0.0.1:8000";
+
+const MapController = ({ center, zoom }) => {
+  const map = useMap();
+  
+  useEffect(() => {
+    if (center) {
+      map.setView(center, zoom || 15);
+    }
+  }, [map, center, zoom]);
+
+  return null;
+};
 
 // SweetAlert2 replacement component
 const showAlert = {
@@ -96,7 +108,7 @@ const MarketFormModal = ({
     jumlah_mck: "",
     jumlah_bango: "",
     jumlah_kantor: "",
-    tps: "",
+    jumlah_tps: "",
     keterangan: "",
     foto: null,
   });
@@ -105,6 +117,7 @@ const MarketFormModal = ({
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPhoto, setCurrentPhoto] = useState(null);
+  const [mapCenter, setMapCenter] = useState(null);
 
   useEffect(() => {
     if (open && initialData) {
@@ -118,7 +131,7 @@ const MarketFormModal = ({
         jumlah_mck: initialData.jumlah_mck || "",
         jumlah_bango: initialData.jumlah_bango || "",
         jumlah_kantor: initialData.jumlah_kantor || "",
-        tps: initialData.tps || "",
+        jumlah_tps: initialData.jumlah_tps || "",
         keterangan: initialData.keterangan || "",
         foto: null,
       });
@@ -128,10 +141,12 @@ const MarketFormModal = ({
       }
 
       if (initialData.latitude && initialData.longitude) {
-        setPosition([
+        const newPosition = [
           parseFloat(initialData.latitude),
           parseFloat(initialData.longitude),
-        ]);
+        ];
+        setPosition(newPosition);
+        setMapCenter(newPosition);
         setShowSearch(true);
       }
     } else if (open && !initialData) {
@@ -145,12 +160,13 @@ const MarketFormModal = ({
         jumlah_mck: "",
         jumlah_bango: "",
         jumlah_kantor: "",
-        tps: "",
+        jumlah_tps: "",
         keterangan: "",
         foto: null,
       });
       setCurrentPhoto(null);
       setPosition(null);
+      setMapCenter(null);
       setShowSearch(false);
       setSearchQuery("");
     }
@@ -199,7 +215,10 @@ const MarketFormModal = ({
       const { lat, lon, display_name } = data[0];
       const latNum = parseFloat(lat);
       const lonNum = parseFloat(lon);
-      setPosition([latNum, lonNum]);
+      const newPosition = [latNum, lonNum];
+
+      setPosition(newPosition);
+      setMapCenter(newPosition);
 
       setFormData((prev) => ({
         ...prev,
@@ -229,7 +248,7 @@ const MarketFormModal = ({
     submitFormData.append("jumlah_mck", formData.jumlah_mck);
     submitFormData.append("jumlah_bango", formData.jumlah_bango);
     submitFormData.append("jumlah_kantor", formData.jumlah_kantor);
-    submitFormData.append("tps", formData.tps);
+    submitFormData.append("jumlah_tps", formData.jumlah_tps);
     submitFormData.append("keterangan", formData.keterangan);
 
     if (formData.foto instanceof File) {
@@ -394,6 +413,7 @@ const MarketFormModal = ({
                         >
                           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                           <MapClickHandler />
+                          <MapController center = {mapCenter} zoom={15} />
                           {position && (
                             <Marker position={position} icon={redIcon} />
                           )}
@@ -513,7 +533,7 @@ const MarketFormModal = ({
                       <input
                         name="tps"
                         type="text"
-                        value={formData.tps}
+                        value={formData.jumlah_tps}
                         onChange={handleChange}
                         placeholder="Tempat Pembuangan Sampah"
                         className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
