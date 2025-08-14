@@ -572,18 +572,18 @@ const HargaBapokTable = () => {
       {/* Enhanced Modal Tambah/Edit */}
       {showModal && (
         <div className="bg-opacity-75 fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-gray-800 shadow-2xl">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white dark:bg-gray-800 shadow-2xl">
             {/* Modal Header */}
-            <div className="rounded-t-xl border-b border-gray-600 bg-gray-700 px-6 py-4">
+            <div className="rounded-t-xl border-b border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-6 py-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold text-gray-100">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                   {modalType === "add"
                     ? "Tambah Data Harga"
                     : "Edit Data Harga"}
                 </h3>
                 <button
                   onClick={() => setShowModal(false)}
-                  className="text-gray-400 transition-colors duration-150 hover:text-gray-200"
+                  className="text-gray-500 dark:text-gray-400 transition-colors duration-150 hover:text-gray-700 dark:hover:text-gray-200"
                 >
                   <svg
                     className="h-6 w-6"
@@ -606,14 +606,14 @@ const HargaBapokTable = () => {
             <form onSubmit={handleSubmit} className="space-y-4 p-6">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-sm font-semibold text-gray-300">
-                    Pasar <span className="text-red-400">*</span>
+                  <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    Pasar <span className="text-red-500 dark:text-red-400">*</span>
                   </label>
                   <select
                     name="id_pasar"
                     value={formData.id_pasar}
                     onChange={handleChange}
-                    className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     required
                     disabled={currentUser?.is_petugas_pasar}
                   >
@@ -625,19 +625,19 @@ const HargaBapokTable = () => {
                     ))}
                   </select>
                   {currentUser?.is_petugas_pasar && (
-                    <p className="mt-1 text-xs text-gray-400"></p>
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400"></p>
                   )}
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-semibold text-gray-300">
-                    Bahan Pokok <span className="text-red-400">*</span>
+                  <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    Bahan Pokok <span className="text-red-500 dark:text-red-400">*</span>
                   </label>
                   <select
                     name="id_bahan_pokok"
                     value={formData.id_bahan_pokok}
                     onChange={handleChange}
-                    className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     required
                   >
                     <option value="">Pilih Bahan Pokok</option>
@@ -651,29 +651,29 @@ const HargaBapokTable = () => {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-gray-300">
-                  Tanggal <span className="text-red-400">*</span>
+                <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Tanggal <span className="text-red-500 dark:text-red-400">*</span>
                 </label>
                 <input
                   type="date"
                   name="tanggal"
                   value={formData.tanggal}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-sm font-semibold text-gray-300">
-                    Harga (Rp) <span className="text-red-400">*</span>
+                  <label className="mb-1 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    Harga (Rp) <span className="text-red-500 dark:text-red-400">*</span>
                   </label>
 
                   {modalType === "edit" && (
-                    <p className="mb-2 text-sm text-gray-400">
+                    <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
                       Harga saat ini:{" "}
-                      <span className="font-semibold text-white">
+                      <span className="font-semibold text-gray-900 dark:text-white">
                         {formatRupiah(hargaSebelumnya || "0")}
                       </span>
                     </p>
@@ -697,7 +697,7 @@ const HargaBapokTable = () => {
                         }));
                       }
                     }}
-                    className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     placeholder="Masukkan harga"
                     required
                   />
@@ -708,10 +708,10 @@ const HargaBapokTable = () => {
 
                 {modalType === "edit" && (
                   <div>
-                    <label className="mb-1 block text-sm font-semibold text-gray-300">
+                    <label className="mb-1 block text-sm font-semibold text-gray-700 dark:text-gray-300">
                       Harga Baru
                     </label>
-                    <p className="mb-2 text-sm text-gray-400">
+                    <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
                       Masukkan harga baru
                     </p>
                     <input
@@ -741,8 +741,8 @@ const HargaBapokTable = () => {
                       }}
                       className={`w-full rounded-lg border px-3 py-2 transition-all duration-150 focus:ring-2 focus:outline-none ${
                         formError.harga_baru
-                          ? "border-red-500 bg-gray-700 text-red-400 focus:ring-red-500"
-                          : "border-gray-600 bg-gray-700 text-gray-100 focus:ring-blue-500"
+                          ? "border-red-500 bg-white dark:bg-gray-700 text-red-600 dark:text-red-400 focus:ring-red-500"
+                          : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-blue-500"
                       }`}
                       placeholder="Masukkan harga baru"
                     />
@@ -755,15 +755,15 @@ const HargaBapokTable = () => {
                 )}
 
                 <div>
-                  <label className="mb-2 block text-sm font-semibold text-gray-300">
-                    Stok <span className="text-red-400">*</span>
+                  <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    Stok <span className="text-red-500 dark:text-red-400">*</span>
                   </label>
                   <input
                     type="number"
                     name="stok"
                     value={formData.stok}
                     onChange={handleChange}
-                    className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     placeholder="0"
                     required
                   />
@@ -771,14 +771,14 @@ const HargaBapokTable = () => {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-gray-300">
+                <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
                   Status Integrasi
                 </label>
                 <select
                   name="status_integrasi"
                   value={formData.status_integrasi}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 >
                   <option value="offline">Offline</option>
                   <option value="online">Online</option>
@@ -786,11 +786,11 @@ const HargaBapokTable = () => {
               </div>
 
               {/* Modal Footer */}
-              <div className="flex justify-end space-x-3 border-t border-gray-600 pt-4">
+              <div className="flex justify-end space-x-3 border-t border-gray-200 dark:border-gray-600 pt-4">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="rounded-lg bg-gray-600 px-4 py-2 font-medium text-white transition-colors duration-150 hover:bg-gray-700"
+                  className="rounded-lg bg-gray-500 dark:bg-gray-600 px-4 py-2 font-medium text-white transition-colors duration-150 hover:bg-gray-600 dark:hover:bg-gray-700"
                 >
                   Batal
                 </button>
