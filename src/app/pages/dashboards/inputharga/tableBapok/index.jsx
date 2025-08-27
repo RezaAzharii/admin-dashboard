@@ -12,15 +12,18 @@ const HargaBapokTable = () => {
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState("add");
+  const today = new Date().toLocaleDateString("en-CA", {
+    timeZone: "Asia/Jakarta",
+  });
+  const [selectedDate, setSelectedDate] = useState(today);
   const [formData, setFormData] = useState({
     id: null,
     id_pasar: "",
     id_bahan_pokok: "",
     tanggal: "",
     harga: "",
-    harga_baru: "",
     stok: "",
-    status_integrasi: "offline",
+    status_integrasi: "pending",
   });
 
   const [listPasar, setListPasar] = useState([]);
@@ -31,25 +34,20 @@ const HargaBapokTable = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [filteredData, setFilteredData] = useState([]);
   const [hargaError, setHargaError] = useState("");
-  // Tambahkan ini di awal komponen jika belum ada
-  const [formError, setFormError] = useState({
-    harga_baru: "",
-  });
-  const [hargaSebelumnya, setHargaSebelumnya] = useState("0");
 
   useEffect(() => {
-    if (currentUser && dataHarga.length > 0) {
-      // Filter manual jika backend tidak memfilter dengan benar
-      const filtered = currentUser?.is_petugas_pasar
-        ? dataHarga.filter((item) => item.id_pasar == currentUser.id_pasar)
-        : dataHarga;
+    if (!dataHarga || dataHarga.length === 0) return;
 
-      setFilteredData(filtered);
-      // console.log("Filtered data:", filtered);
-    } else {
-      setFilteredData(dataHarga);
-    }
-  }, [dataHarga, currentUser]);
+    const filtered = dataHarga.filter((item) => {
+      // normalisasi tanggal ke YYYY-MM-DD
+      const itemDate = new Date(item.tanggal).toLocaleDateString("en-CA", {
+        timeZone: "Asia/Jakarta",
+      });
+      return itemDate === selectedDate;
+    });
+
+    setFilteredData(filtered);
+  }, [selectedDate, dataHarga, currentUser]);
 
   useEffect(() => {
     if (currentUser) {
@@ -57,11 +55,7 @@ const HargaBapokTable = () => {
       fetchDataHarga();
       fetchListDependencies();
     }
-  }, [currentUser]);
-
-  useEffect(() => {
-    setFilteredData(dataHarga);
-  }, [dataHarga]);
+  }, [selectedDate, currentUser]);
 
   const fetchDataHarga = async () => {
     try {
@@ -69,13 +63,15 @@ const HargaBapokTable = () => {
       const token = localStorage.getItem("authToken");
 
       let url = API.HARGA_BAPOK.INDEX;
-      let params = {};
+      let params = {
+        tanggal: selectedDate, // <-- Kirim tanggal yang dipilih ke backend
+      };
 
       if (currentUser?.is_petugas_pasar && currentUser.id_pasar) {
         params.id_pasar = currentUser.id_pasar;
-        // console.log(
-        //   `Fetching data for pasar ${currentUser.id_pasar} (${currentUser.name})`,
-        // );
+        console.log(
+          `Fetching data for pasar ${currentUser.id_pasar} (${currentUser.name})`,
+        );
       }
 
       const response = await axios.get(url, {
@@ -127,13 +123,6 @@ const HargaBapokTable = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const checkExistingData = (id_pasar, id_bahan_pokok) => {
-    return dataHarga.find(
-      (item) =>
-        item.id_pasar == id_pasar && item.id_bahan_pokok == id_bahan_pokok,
-    );
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -156,33 +145,6 @@ const HargaBapokTable = () => {
     try {
       const token = localStorage.getItem("authToken");
       const headers = { Authorization: `Bearer ${token}` };
-
-      if (modalType === "add") {
-        const existingData = checkExistingData(
-          formData.id_pasar,
-          formData.id_bahan_pokok,
-        );
-
-        if (existingData) {
-          Swal.fire({
-            icon: "warning",
-            title: "Data Sudah Ada",
-            html: `Data untuk bahan pokok ini di pasar ini sudah ada.<br><br>
-            Apakah Anda ingin mengedit data yang sudah ada?`,
-            showCancelButton: true,
-            confirmButtonText: "Ya, Edit Data",
-            cancelButtonText: "Tidak",
-          }).then((result) => {
-            if (result.isConfirmed) {
-              handleEditClick(existingData);
-            } else {
-              setShowModal(false);
-            }
-          });
-          setLoading(false);
-          return;
-        }
-      }
 
       if (modalType === "add") {
         await axios.post(API.HARGA_BAPOK.STORE, formData, { headers });
@@ -209,9 +171,8 @@ const HargaBapokTable = () => {
         id_bahan_pokok: "",
         tanggal: "",
         harga: "",
-        harga_baru: "",
         stok: "",
-        status_integrasi: "offline",
+        status_integrasi: "pending",
       });
 
       await fetchDataHarga();
@@ -233,7 +194,9 @@ const HargaBapokTable = () => {
   };
 
   const handleAddClick = () => {
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toLocaleDateString("en-CA", {
+      timeZone: "Asia/Jakarta",
+    });
 
     setModalType("add");
     setFormData({
@@ -244,30 +207,84 @@ const HargaBapokTable = () => {
       id_bahan_pokok: "",
       tanggal: today,
       harga: "",
-      harga_baru: "",
       stok: "",
-      status_integrasi: "offline",
+      status_integrasi: "pending",
     });
     setShowModal(true);
   };
 
   const handleEditClick = (item) => {
-    const today = new Date().toISOString().split("T")[0];
     setModalType("edit");
+
+    // konversi tanggal sesuai format Asia/Jakarta ke YYYY-MM-DD
+    const formattedDate = new Date(item.tanggal).toLocaleDateString("en-CA", {
+      timeZone: "Asia/Jakarta",
+    });
+
     setFormData({
       id: item.id,
       id_pasar: item.id_pasar,
       id_bahan_pokok: item.id_bahan_pokok,
-      tanggal: today,
+      tanggal: formattedDate, // sudah konsisten dengan filter
       harga: item.harga,
-      harga_baru: "",
       stok: item.stok,
       status_integrasi: item.status_integrasi,
     });
-    setHargaSebelumnya(item.harga_baru);
+
     setShowModal(true);
   };
 
+  const handleApproveClick = async (id) => {
+    Swal.fire({
+      title: "Setujui Data?",
+      text: "Apakah Anda yakin ingin menyetujui data ini?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Setujui",
+      cancelButtonText: "Batal",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        setLoading(true);
+        try {
+          const token = localStorage.getItem("authToken");
+          const selectedItem = dataHarga.find((item) => item.id === id);
+
+          if (!selectedItem) throw new Error("Data tidak ditemukan");
+
+          const payload = {
+            id_pasar: selectedItem.id_pasar,
+            id_bahan_pokok: selectedItem.id_bahan_pokok,
+            tanggal: new Date(selectedItem.tanggal).toLocaleDateString(
+              "en-CA",
+              { timeZone: "Asia/Jakarta" },
+            ),
+            harga: parseInt(selectedItem.harga),
+            harga_baru: parseInt(selectedItem.harga_baru || selectedItem.harga), // fallback
+            stok: parseInt(selectedItem.stok),
+            status_integrasi: "approve",
+          };
+
+          await axios.put(API.HARGA_BAPOK.UPDATE(id), payload, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          Swal.fire("Berhasil!", "Data telah disetujui.", "success");
+          fetchDataHarga();
+        } catch (err) {
+          console.error("Gagal menyetujui data:", err);
+          Swal.fire(
+            "Gagal!",
+            "Terjadi kesalahan saat menyetujui data.",
+            "error",
+          );
+        } finally {
+          setLoading(false);
+        }
+      }
+    });
+  };
   const handleDeleteClick = async (id) => {
     Swal.fire({
       title: "Apakah Anda yakin?",
@@ -355,7 +372,7 @@ const HargaBapokTable = () => {
         key="prev"
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="mx-1 rounded border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
+        className="mx-1 rounded border border-gray-600 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-700"
       >
         ‹
       </button>,
@@ -370,7 +387,7 @@ const HargaBapokTable = () => {
           className={`mx-1 rounded border px-3 py-2 text-sm font-medium ${
             currentPage === i
               ? "border-blue-600 bg-blue-600 text-white"
-              : "border-gray-600 bg-gray-700 text-gray-300 hover:bg-gray-600"
+              : "border-gray-600 bg-gray-50 text-gray-900 hover:bg-gray-600 dark:bg-gray-700 dark:text-gray-100"
           }`}
         >
           {i}
@@ -384,7 +401,7 @@ const HargaBapokTable = () => {
         key="next"
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="mx-1 rounded border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
+        className="mx-1 rounded border border-gray-600 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-700 dark:text-gray-100"
       >
         ›
       </button>,
@@ -412,12 +429,22 @@ const HargaBapokTable = () => {
         <h2 className="dark:text-dark-50 text-2xl font-bold text-gray-800">
           Daftar Harga Bahan Pokok
         </h2>
-        <button
-          onClick={handleAddClick}
-          className="transform rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:bg-blue-700"
-        >
-          + Tambah Data
-        </button>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            max={new Date().toISOString().split("T")[0]}
+            className="rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:text-gray-100"
+          />
+
+          <button
+            onClick={handleAddClick}
+            className="transform rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:bg-blue-700"
+          >
+            + Tambah Data
+          </button>
+        </div>
       </div>
 
       {/* Show entries selector */}
@@ -426,7 +453,7 @@ const HargaBapokTable = () => {
         <select
           value={itemsPerPage}
           onChange={handleItemsPerPageChange}
-          className="dark:text-dark-50 rounded border border-gray-600 bg-gray-50 dark:bg-gray-700 px-3 py-1 text-gray-800 focus:border-blue-500 focus:outline-none"
+          className="dark:text-dark-50 rounded border border-gray-600 bg-gray-50 px-3 py-1 text-gray-800 focus:border-blue-500 focus:outline-none dark:bg-gray-700"
         >
           <option value={5}>5</option>
           <option value={10}>10</option>
@@ -459,9 +486,6 @@ const HargaBapokTable = () => {
               </th>
               <th className="border-b border-gray-200 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-700 uppercase dark:border-gray-600 dark:text-gray-300">
                 Harga
-              </th>
-              <th className="border-b border-gray-200 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-700 uppercase dark:border-gray-600 dark:text-gray-300">
-                Harga Baru
               </th>
               <th className="border-b border-gray-200 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-700 uppercase dark:border-gray-600 dark:text-gray-300">
                 % Perubahan
@@ -511,15 +535,23 @@ const HargaBapokTable = () => {
                   <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
                     Rp {parseFloat(item.harga).toLocaleString("id-ID")}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
-                    {item.harga_baru
-                      ? `Rp ${parseFloat(item.harga_baru).toLocaleString("id-ID")}`
-                      : "-"}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
-                    {item.harga_baru
-                      ? `${(((item.harga_baru - item.harga) / item.harga) * 100).toFixed(2)}%`
-                      : "0%"}
+                  <td className="px-4 py-3 text-sm">
+                    {item.change_status === "up" && (
+                      <span className="text-red-600 dark:text-red-400">
+                        ▲ {item.change_percent}%
+                      </span>
+                    )}
+                    {item.change_status === "down" && (
+                      <span className="text-green-600 dark:text-green-400">
+                        ▼ {item.change_percent}%
+                      </span>
+                    )}
+                    {item.change_status === "same" && (
+                      <span className="text-gray-600 dark:text-gray-300">
+                        {item.change_percent}%
+                      </span>
+                    )}
+                    {item.change_status === "N/A" && "-"}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
                     {item.stok}{" "}
@@ -528,25 +560,40 @@ const HargaBapokTable = () => {
                   <td className="px-4 py-3 text-sm">
                     <span
                       className={`rounded-full px-2 py-1 text-xs font-medium ${
-                        item.status_integrasi === "online"
+                        item.status_integrasi === "approve"
                           ? "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200"
-                          : "bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300"
+                          : item.status_integrasi === "pending"
+                            ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200"
+                            : "bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300"
                       }`}
                     >
-                      {item.status_integrasi}
+                      {item.status_integrasi === "approve"
+                        ? "Disetujui"
+                        : item.status_integrasi === "pending"
+                          ? "Pending"
+                          : item.status_integrasi}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <div className="flex space-x-2">
+                      {item.status_integrasi === "pending" &&
+                        !currentUser?.is_petugas_pasar && (
+                          <button
+                            onClick={() => handleApproveClick(item.id)}
+                            className="inline-flex h-8 items-center justify-center rounded-lg bg-green-100 px-3 text-green-800 transition-all duration-200 hover:bg-green-200 dark:bg-green-600/20 dark:text-green-400 dark:hover:bg-green-600/30 dark:hover:text-green-300"
+                          >
+                            Setujui
+                          </button>
+                        )}
                       <button
                         onClick={() => handleEditClick(item)}
-                        className="inline-flex h-8 items-center justify-center rounded-lg bg-yellow-100 px-3 text-yellow-800 transition-all duration-200 hover:bg-yellow-200 dark:bg-yellow-600/20 dark:text-yellow-400 dark:hover:bg-yellow-600/30 dark:hover:text-yellow-300"
+                        className="inline-flex h-8 items-center justify-center rounded-lg bg-yellow-100 px-3 text-yellow-800 transition-all duration-200 hover:bg-yellow-200 dark:bg-yellow-600/20 dark:text-yellow-300 dark:hover:bg-yellow-600/30 dark:hover:text-yellow-300"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDeleteClick(item.id)}
-                        className="inline-flex h-8 items-center justify-center rounded-lg bg-red-100 px-3 text-red-800 transition-all duration-200 hover:bg-red-200 dark:bg-red-600/20 dark:text-red-400 dark:hover:bg-red-600/30 dark:hover:text-red-300"
+                        className="inline-flex h-8 items-center justify-center rounded-lg bg-red-100 px-3 text-red-800 transition-all duration-200 hover:bg-red-200 dark:bg-red-600/20 dark:text-red-300 dark:hover:bg-red-600/30 dark:hover:text-red-300"
                       >
                         Hapus
                       </button>
@@ -572,9 +619,9 @@ const HargaBapokTable = () => {
       {/* Enhanced Modal Tambah/Edit */}
       {showModal && (
         <div className="bg-opacity-75 fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white dark:bg-gray-800 shadow-2xl">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white shadow-2xl dark:bg-gray-800">
             {/* Modal Header */}
-            <div className="rounded-t-xl border-b border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-6 py-4">
+            <div className="rounded-t-xl border-b border-gray-200 bg-gray-50 px-6 py-4 dark:border-gray-600 dark:bg-gray-700">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                   {modalType === "add"
@@ -583,7 +630,7 @@ const HargaBapokTable = () => {
                 </h3>
                 <button
                   onClick={() => setShowModal(false)}
-                  className="text-gray-500 dark:text-gray-400 transition-colors duration-150 hover:text-gray-700 dark:hover:text-gray-200"
+                  className="text-gray-500 transition-colors duration-150 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                 >
                   <svg
                     className="h-6 w-6"
@@ -607,13 +654,14 @@ const HargaBapokTable = () => {
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
                   <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Pasar <span className="text-red-500 dark:text-red-400">*</span>
+                    Pasar{" "}
+                    <span className="text-red-500 dark:text-red-400">*</span>
                   </label>
                   <select
                     name="id_pasar"
                     value={formData.id_pasar}
                     onChange={handleChange}
-                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                     required
                     disabled={currentUser?.is_petugas_pasar}
                   >
@@ -631,13 +679,14 @@ const HargaBapokTable = () => {
 
                 <div>
                   <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Bahan Pokok <span className="text-red-500 dark:text-red-400">*</span>
+                    Bahan Pokok{" "}
+                    <span className="text-red-500 dark:text-red-400">*</span>
                   </label>
                   <select
                     name="id_bahan_pokok"
                     value={formData.id_bahan_pokok}
                     onChange={handleChange}
-                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                     required
                   >
                     <option value="">Pilih Bahan Pokok</option>
@@ -652,32 +701,26 @@ const HargaBapokTable = () => {
 
               <div>
                 <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Tanggal <span className="text-red-500 dark:text-red-400">*</span>
+                  Tanggal{" "}
+                  <span className="text-red-500 dark:text-red-400">*</span>
                 </label>
                 <input
                   type="date"
                   name="tanggal"
                   value={formData.tanggal}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                   required
+                  max={new Date().toISOString().split("T")[0]}
                 />
               </div>
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
                   <label className="mb-1 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Harga (Rp) <span className="text-red-500 dark:text-red-400">*</span>
+                    Harga (Rp){" "}
+                    <span className="text-red-500 dark:text-red-400">*</span>
                   </label>
-
-                  {modalType === "edit" && (
-                    <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
-                      Harga saat ini:{" "}
-                      <span className="font-semibold text-gray-900 dark:text-white">
-                        {formatRupiah(hargaSebelumnya || "0")}
-                      </span>
-                    </p>
-                  )}
 
                   <input
                     type="text"
@@ -697,7 +740,7 @@ const HargaBapokTable = () => {
                         }));
                       }
                     }}
-                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                     placeholder="Masukkan harga"
                     required
                   />
@@ -706,91 +749,29 @@ const HargaBapokTable = () => {
                   )}
                 </div>
 
-                {modalType === "edit" && (
-                  <div>
-                    <label className="mb-1 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      Harga Baru
-                    </label>
-                    <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
-                      Masukkan harga baru
-                    </p>
-                    <input
-                      type="text"
-                      name="harga_baru"
-                      value={formatRupiah(formData.harga_baru || "")}
-                      onChange={(e) => {
-                        const rawValue = unformatRupiah(e.target.value);
-                        const numericValue = parseInt(rawValue, 10);
-
-                        if (numericValue === 0 || /^0[0-9]*$/.test(rawValue)) {
-                          setFormError((prev) => ({
-                            ...prev,
-                            harga_baru: "Harga tidak boleh diisi 0",
-                          }));
-                        } else {
-                          setFormError((prev) => ({
-                            ...prev,
-                            harga_baru: "",
-                          }));
-                        }
-
-                        setFormData((prev) => ({
-                          ...prev,
-                          harga_baru: rawValue,
-                        }));
-                      }}
-                      className={`w-full rounded-lg border px-3 py-2 transition-all duration-150 focus:ring-2 focus:outline-none ${
-                        formError.harga_baru
-                          ? "border-red-500 bg-white dark:bg-gray-700 text-red-600 dark:text-red-400 focus:ring-red-500"
-                          : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-blue-500"
-                      }`}
-                      placeholder="Masukkan harga baru"
-                    />
-                    {formError.harga_baru && (
-                      <p className="mt-1 text-sm text-red-500">
-                        {formError.harga_baru}
-                      </p>
-                    )}
-                  </div>
-                )}
-
                 <div>
                   <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Stok <span className="text-red-500 dark:text-red-400">*</span>
+                    Stok{" "}
+                    <span className="text-red-500 dark:text-red-400">*</span>
                   </label>
                   <input
                     type="number"
                     name="stok"
                     value={formData.stok}
                     onChange={handleChange}
-                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                     placeholder="0"
                     required
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Status Integrasi
-                </label>
-                <select
-                  name="status_integrasi"
-                  value={formData.status_integrasi}
-                  onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                >
-                  <option value="offline">Offline</option>
-                  <option value="online">Online</option>
-                </select>
-              </div>
-
               {/* Modal Footer */}
-              <div className="flex justify-end space-x-3 border-t border-gray-200 dark:border-gray-600 pt-4">
+              <div className="flex justify-end space-x-3 border-t border-gray-200 pt-4 dark:border-gray-600">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="rounded-lg bg-gray-500 dark:bg-gray-600 px-4 py-2 font-medium text-white transition-colors duration-150 hover:bg-gray-600 dark:hover:bg-gray-700"
+                  className="rounded-lg bg-gray-500 px-4 py-2 font-medium text-white transition-colors duration-150 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700"
                 >
                   Batal
                 </button>

@@ -287,12 +287,10 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <RefreshCw className="mx-auto mb-4 h-8 w-8 animate-spin text-blue-600" />
-          <p className="text-white">Memuat data dashboard...</p>
+        <div className="flex items-center justify-center py-12">
+          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-500"></div>
+          <span className="ml-3 text-gray-300">Memuat data...</span>
         </div>
-      </div>
     );
   }
 

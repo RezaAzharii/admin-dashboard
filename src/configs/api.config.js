@@ -28,6 +28,7 @@ const API = {
   },
   HARGA_BAPOK: {
     INDEX: `${BASE_URL}/harga-bapok`,
+    TABLE:`${BASE_URL}/harga-bapok-table`,
     STORE: `${BASE_URL}/harga-bapok`,
     UPDATE: (id) => `${BASE_URL}/harga-bapok/${id}`,
     DELETE: (id) => `${BASE_URL}/harga-bapok/${id}`,

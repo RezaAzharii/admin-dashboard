@@ -118,6 +118,9 @@ const MarketFormModal = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPhoto, setCurrentPhoto] = useState(null);
   const [mapCenter, setMapCenter] = useState(null);
+  const [loading] = useState(true);
+
+  
 
   useEffect(() => {
     if (open && initialData) {
@@ -296,6 +299,15 @@ const MarketFormModal = ({
     }
   };
 
+  if (loading) {
+    return (
+        <div className="flex items-center justify-center py-12">
+          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-500"></div>
+          <span className="ml-3 text-gray-300">Memuat data...</span>
+        </div>
+    );
+  }
+
   return (
     <Transition show={open} as={Fragment}>
       <Dialog as="div" onClose={onClose} className="relative z-50">
@@ -369,7 +381,7 @@ const MarketFormModal = ({
                     <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Alamat
                     </label>
-                    <input
+                    <textarea
                       name="alamat"
                       value={formData.alamat}
                       readOnly
@@ -531,7 +543,7 @@ const MarketFormModal = ({
                         TPS
                       </label>
                       <input
-                        name="tps"
+                        name="jumlah_tps"
                         type="text"
                         value={formData.jumlah_tps}
                         onChange={handleChange}
@@ -898,7 +910,7 @@ const Pasar = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="inline-flex items-center rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-700 dark:border-green-800 dark:bg-green-900/30 dark:text-green-300">
+                      <div className="inline-flex items-center rounded-full  px-3 py-1 text-xs font-medium  ">
                         {pasar.keterangan}
                       </div>
                     </td>

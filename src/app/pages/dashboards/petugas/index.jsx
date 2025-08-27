@@ -1,17 +1,17 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import API from "configs/api.config";
 import { Page } from "components/shared/Page";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 const MySwal = withReactContent(Swal);
 
 export default function Petugas() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [entriesPerPage, setEntriesPerPage] = useState(10);
+  const [entriesPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [reloadTrigger, setReloadTrigger] = useState(false); // State untuk trigger reload
 
   // Modal state
@@ -285,19 +285,88 @@ export default function Petugas() {
     }
   };
 
-  // Pagination
-  const totalPages = useMemo(
-    () => Math.ceil(data.length / entriesPerPage),
-    [data.length, entriesPerPage],
-  );
-  const currentEntries = useMemo(() => {
-    const start = (currentPage - 1) * entriesPerPage;
-    return data.slice(start, start + entriesPerPage);
-  }, [data, currentPage, entriesPerPage]);
+  // Pagination logic
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentData = data.slice(startIndex, endIndex);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (e) => {
+    setItemsPerPage(parseInt(e.target.value));
+    setCurrentPage(1);
+  };
+
+  const renderPaginationButtons = () => {
+    const buttons = [];
+    const maxVisiblePages = 5;
+
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    // Previous button
+    buttons.push(
+      <button
+        key="prev"
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="mx-1 rounded border border-gray-600 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-700 dark:text-gray-100"
+      >
+        ‹
+      </button>,
+    );
+
+    // Page numbers
+    for (let i = startPage; i <= endPage; i++) {
+      buttons.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`mx-1 rounded border px-3 py-2 text-sm font-medium ${
+            currentPage === i
+              ? "border-blue-600 bg-blue-600 text-white"
+              : "border-gray-600 bg-gray-50 text-gray-900 hover:bg-gray-600 dark:bg-gray-700 dark:text-gray-100"
+          }`}
+        >
+          {i}
+        </button>,
+      );
+    }
+
+    // Next button
+    buttons.push(
+      <button
+        key="next"
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="mx-1 rounded border border-gray-600 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-700 dark:text-gray-100"
+      >
+        ›
+      </button>,
+    );
+
+    return buttons;
+  };
+
+  if (loading) {
+    return (
+        <div className="flex items-center justify-center py-12">
+          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-500"></div>
+          <span className="ml-3 text-gray-300">Memuat data...</span>
+        </div>
+    );
+  }
 
   return (
     <Page title="Petugas">
-      <div className="min-h-screen w-full  px-6 pt-5 ">
+      <div className="min-h-screen w-full px-6 pt-5">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">
             Daftar Petugas
@@ -316,21 +385,20 @@ export default function Petugas() {
           </p>
         ) : (
           <>
-            <div className="mb-4 flex items-center space-x-2 text-gray-900 dark:text-white">
-              <span>Tampilkan</span>
+            {/* Show entries selector */}
+            <div className="mb-4 flex items-center text-gray-900 dark:text-white">
+              <span className="mr-2">tampilkan</span>
               <select
-                className="rounded-md border border-gray-300 bg-white px-2 py-1 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                value={entriesPerPage}
-                onChange={(e) => {
-                  setEntriesPerPage(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
+                value={itemsPerPage}
+                onChange={handleItemsPerPageChange}
+                className="rounded border border-gray-300 bg-white px-3 py-1 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
               >
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="25">25</option>
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
               </select>
-              <span>data per halaman</span>
+              <span className="ml-2">data per halaman</span>
             </div>
 
             <div className="overflow-x-auto rounded-lg shadow-lg">
@@ -358,7 +426,7 @@ export default function Petugas() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
-                  {currentEntries.length === 0 ? (
+                  {currentData.length === 0 ? (
                     <tr>
                       <td
                         colSpan="6"
@@ -368,7 +436,7 @@ export default function Petugas() {
                       </td>
                     </tr>
                   ) : (
-                    currentEntries.map((user, i) => (
+                    currentData.map((user, i) => (
                       <tr
                         key={user.user_id}
                         className="transition-all duration-300 hover:bg-gray-50 dark:hover:bg-gray-800"
@@ -409,43 +477,14 @@ export default function Petugas() {
               </table>
             </div>
 
-            <div className="mt-4 flex items-center justify-between px-2 text-gray-900 dark:text-white">
-              <div>
-                Menampilkan{" "}
-                {Math.min((currentPage - 1) * entriesPerPage + 1, data.length)}{" "}
-                - {Math.min(currentPage * entriesPerPage, data.length)} dari{" "}
-                {data.length} data
+            {/* Pagination */}
+            <div className="mt-4 flex items-center justify-between">
+              <div className="text-sm text-gray-900 dark:text-white">
+                menampilkan {startIndex + 1} - {Math.min(endIndex, data.length)}{" "}
+                dari {data.length} data
               </div>
-              <div className="flex space-x-2">
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage((p) => p - 1)}
-                  className="rounded-md bg-gray-200 px-3 py-1 text-gray-700 hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-                >
-                  <ChevronLeftIcon className="h-[12px]" />
-                </button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`rounded-md px-3 py-1 transition-colors ${
-                        currentPage === page
-                          ? "bg-blue-600 text-white"
-                          : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ),
-                )}
-                <button
-                  disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage((p) => p + 1)}
-                  className="rounded-md bg-gray-200 px-3 py-1 text-gray-700 hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-                >
-                  <ChevronRightIcon className="h-[12px]" />
-                </button>
+              <div className="flex items-center">
+                {renderPaginationButtons()}
               </div>
             </div>
           </>
