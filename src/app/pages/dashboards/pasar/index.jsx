@@ -118,7 +118,7 @@ const MarketFormModal = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPhoto, setCurrentPhoto] = useState(null);
   const [mapCenter, setMapCenter] = useState(null);
-  const [loading] = useState(true);
+
 
   
 
@@ -299,14 +299,6 @@ const MarketFormModal = ({
     }
   };
 
-  if (loading) {
-    return (
-        <div className="flex items-center justify-center py-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-500"></div>
-          <span className="ml-3 text-gray-300">Memuat data...</span>
-        </div>
-    );
-  }
 
   return (
     <Transition show={open} as={Fragment}>
