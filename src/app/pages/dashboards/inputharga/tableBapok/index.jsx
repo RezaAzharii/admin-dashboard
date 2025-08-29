@@ -28,7 +28,7 @@ const HargaBapokTable = () => {
 
   const [listPasar, setListPasar] = useState([]);
   const [listBahanPokok, setListBahanPokok] = useState([]);
-
+const [stokError, setStokError] = useState("");
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -758,11 +758,26 @@ const HargaBapokTable = () => {
                     type="number"
                     name="stok"
                     value={formData.stok}
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value, 10);
+
+                      if (!value || value <= 0) {
+                        setStokError("Stok minimal 1");
+                      } else {
+                        setStokError("");
+                        setFormData((prev) => ({
+                          ...prev,
+                          stok: value,
+                        }));
+                      }
+                    }}
                     className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                     placeholder="0"
                     required
                   />
+                  {stokError && (
+                    <p className="mt-1 text-sm text-red-500">{stokError}</p>
+                  )}
                 </div>
               </div>
 
