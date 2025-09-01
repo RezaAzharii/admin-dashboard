@@ -402,8 +402,8 @@ export default function Petugas() {
             </div>
 
             <div className="overflow-x-auto rounded-lg shadow-lg">
-              <table className="min-w-full border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900">
-                <thead className="bg-gray-50 dark:bg-gray-800">
+              <table className="min-w-full border border-gray-200 bg-white dark:border-gray-700 dark:bg-dark-900">
+                <thead className="bg-gray-50 dark:bg-dark-900">
                   <tr>
                     <th className="rounded-tl-lg border-b border-gray-200 px-4 py-3 text-left text-sm font-semibold tracking-wider text-gray-700 uppercase dark:border-gray-600 dark:text-white">
                       #
@@ -425,7 +425,7 @@ export default function Petugas() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
+                <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-dark-900">
                   {currentData.length === 0 ? (
                     <tr>
                       <td

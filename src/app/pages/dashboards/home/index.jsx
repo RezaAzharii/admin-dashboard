@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Page } from "components/shared/Page";
 import {
   XAxis,
   YAxis,
@@ -22,20 +23,10 @@ import API from "configs/api.config";
 import { useContext } from "react";
 import AuthContext from "app/contexts/auth/authContext";
 
-// Mock Page component for demonstration purposes, replace with your actual Page component
-const Page = ({ title, children }) => (
-  <div className="min-h-screen font-sans text-gray-900">
-    <header className="p-4 shadow-md">
-      <h1 className="text-center text-3xl font-bold text-gray-900">{title}</h1>
-    </header>
-    <main className="p-4">{children}</main>
-  </div>
-);
-
 export default function Home() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [ setError] = useState(null);
   const { user } = useContext(AuthContext);
 
   // State untuk data real-time
@@ -50,6 +41,10 @@ export default function Home() {
       updateHariIni: 0,
     },
   });
+
+  useEffect(() => {
+    document.title = "Beranda";
+  }, []);
 
   // Update waktu setiap detik
   useEffect(() => {
@@ -294,26 +289,6 @@ export default function Home() {
     );
   }
 
-  if (error) {
-    return (
-      <Page title="Dashboard Error">
-        {" "}
-        {/* Wrapped with Page component */}
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="text-center">
-            <AlertTriangle className="mx-auto mb-4 h-8 w-8 text-red-600" />
-            <p className="mb-4 text-red-600">Error: {error}</p>
-            <button
-              onClick={fetchData}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-            >
-              Coba Lagi
-            </button>
-          </div>
-        </div>
-      </Page>
-    );
-  }
 
   const latestPrices = getLatestPrices();
   const recentUpdates = getRecentUpdates();
@@ -321,7 +296,9 @@ export default function Home() {
   const alerts = generateAlerts();
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 dark:bg-gray-900">
+    <Page title="Beranda">
+
+    <div className="min-h-screen bg-gray-50 p-6 dark:bg-dark-900">
       {/* Header */}
       <div className="mb-8">
         <div className="mb-4 flex items-center justify-between">
@@ -559,5 +536,6 @@ export default function Home() {
         </div>
       </div>
     </div>
+    </Page>
   );
 }

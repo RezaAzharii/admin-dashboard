@@ -466,8 +466,8 @@ const [stokError, setStokError] = useState("");
       </div>
 
       <div className="overflow-x-auto rounded-lg bg-white shadow-xl dark:bg-gray-800">
-        <table className="min-w-full">
-          <thead className="bg-gray-50 dark:bg-gray-700">
+        <table className="min-w-full border border-gray-200  dark:border-gray-700">
+          <thead className="bg-gray-50 dark:bg-dark-900 border-gray-200 dark:border-gray-700">
             <tr>
               <th className="border-b border-gray-200 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-700 uppercase dark:border-gray-600 dark:text-gray-300">
                 #
@@ -501,7 +501,7 @@ const [stokError, setStokError] = useState("");
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+          <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-dark-900">
             {currentData.map((item, index) => {
               // Debugging: Tampilkan warning jika ada data dari pasar lain
               if (

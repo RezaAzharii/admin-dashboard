@@ -257,7 +257,7 @@ export default function BahanPokok() {
         key="prev"
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="mx-1 rounded border border-gray-600 bg-gray-50 dark:bg-gray-700 px-3 py-2 text-sm font-medium text-gray-900 dark:text-gray-100 hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
+        className="mx-1 rounded border border-gray-600 bg-gray-50 dark:bg-dark-900 px-3 py-2 text-sm font-medium text-gray-900 dark:text-gray-100 hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
       >
         ‹
       </button>,
@@ -272,7 +272,7 @@ export default function BahanPokok() {
           className={`mx-1 rounded border px-3 py-2 text-sm font-medium ${
             currentPage === i
               ? "border-blue-600 bg-blue-600 text-white"
-              : "border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-600"
+              : "border-gray-600 bg-gray-50 dark:bg-dark-900 text-gray-900 dark:text-gray-100 hover:bg-gray-600"
           }`}
         >
           {i}
@@ -286,7 +286,7 @@ export default function BahanPokok() {
         key="next"
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="mx-1 rounded border border-gray-600 bg-gray-50 dark:bg-gray-700 px-3 py-2 text-sm font-medium text-gray-900 dark:text-gray-100 hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
+        className="mx-1 rounded border border-gray-600 bg-gray-50 dark:bg-dark-900 px-3 py-2 text-sm font-medium text-gray-900 dark:text-gray-100 hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
       >
         ›
       </button>,
@@ -328,7 +328,7 @@ export default function BahanPokok() {
           <select
             value={itemsPerPage}
             onChange={handleItemsPerPageChange}
-            className="rounded border border-gray-300 bg-white px-3 py-1 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+            className="rounded border border-gray-300 bg-white px-3 py-1 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-dark-900 dark:text-gray-100"
           >
             <option value={5}>5</option>
             <option value={10}>10</option>
@@ -338,9 +338,9 @@ export default function BahanPokok() {
           <span className="ml-2">data per halaman</span>
         </div>
 
-        <div className="overflow-x-auto rounded-lg bg-white shadow-xl dark:bg-gray-800">
-          <table className="min-w-full">
-            <thead className="bg-gray-50 dark:bg-gray-700">
+        <div className="overflow-x-auto rounded-lg bg-white shadow-xl dark:bg-dark-900">
+          <table className="min-w-full  border border-gray-200  dark:border-gray-700">
+            <thead className="bg-gray-50 dark:bg-dark-900">
               <tr>
                 <th className="border-b border-gray-200 px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-700 uppercase dark:border-gray-600 dark:text-gray-300">
                   #
@@ -367,7 +367,7 @@ export default function BahanPokok() {
                 )}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+            <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-dark-900">
               {currentData.map((item, index) => (
                 <tr
                   key={item.id}
@@ -409,7 +409,7 @@ export default function BahanPokok() {
                       className={`rounded-full px-2 py-1 text-xs font-medium ${
                         item.up_stok
                           ? "bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200"
-                          : "bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300"
+                          : "bg-gray-100 text-gray-800 dark:bg-dark-900 dark:text-gray-300"
                       }`}
                     >
                       {item.up_stok}
@@ -460,9 +460,9 @@ export default function BahanPokok() {
         {/* Enhanced Modal */}
         {showModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-            <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white shadow-2xl dark:bg-gray-800">
+            <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white shadow-2xl dark:bg-dark-900">
               {/* Modal Header */}
-              <div className="rounded-t-xl border-b border-gray-200 bg-gray-50 px-6 py-4 dark:border-gray-600 dark:bg-gray-700">
+              <div className="rounded-t-xl border-b border-gray-200 bg-gray-50 px-6 py-4 dark:border-gray-600 dark:bg-dark-900">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                     {modalType === "add"
@@ -502,7 +502,7 @@ export default function BahanPokok() {
                     name="nama"
                     value={formData.nama}
                     onChange={handleChange}
-                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-dark-900 dark:text-gray-100"
                     placeholder="Masukkan nama bahan pokok"
                     required
                   />
@@ -519,7 +519,7 @@ export default function BahanPokok() {
                       name="stok_wajib"
                       value={formData.stok_wajib}
                       onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-dark-900 dark:text-gray-100"
                       placeholder="Masukkan jumlah stok wajib"
                       required
                     />
@@ -535,7 +535,7 @@ export default function BahanPokok() {
                       name="up_stok"
                       value={formData.up_stok}
                       onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-dark-900 dark:text-gray-100"
                       placeholder="Masukkan jumlah up stok"
                       required
                     />
@@ -552,7 +552,7 @@ export default function BahanPokok() {
                       name="urutan"
                       value={formData.urutan}
                       onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-dark-900 dark:text-gray-100"
                       placeholder="Urutan (opsional)"
                     />
                   </div>
@@ -567,7 +567,7 @@ export default function BahanPokok() {
                       name="satuan"
                       value={formData.satuan}
                       onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-dark-900 dark:text-gray-100"
                       placeholder="kg, liter, dll"
                       required
                     />
@@ -582,7 +582,7 @@ export default function BahanPokok() {
                     type="file"
                     accept="image/*"
                     onChange={handlePhotoChange}
-                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 file:mr-4 file:rounded-md file:border-0 file:bg-blue-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-blue-700 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 file:mr-4 file:rounded-md file:border-0 file:bg-blue-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-blue-700 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-dark-900 dark:text-gray-100"
                   />
 
                   {modalType === "edit" && currentPhoto && (
@@ -601,7 +601,7 @@ export default function BahanPokok() {
                           id="delete_photo"
                           checked={deletePhoto}
                           onChange={(e) => setDeletePhoto(e.target.checked)}
-                          className="h-4 w-4 rounded border-gray-300 bg-white text-red-600 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-700"
+                          className="h-4 w-4 rounded border-gray-300 bg-white text-red-600 focus:ring-red-500 dark:border-gray-600 dark:bg-dark-900"
                         />
                         <label
                           htmlFor="delete_photo"
@@ -619,7 +619,7 @@ export default function BahanPokok() {
                   <button
                     type="button"
                     onClick={() => setShowModal(false)}
-                    className="rounded-lg bg-gray-200 px-6 py-2 font-medium text-gray-800 transition-colors duration-150 hover:bg-gray-300 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700"
+                    className="rounded-lg bg-gray-200 px-6 py-2 font-medium text-gray-800 transition-colors duration-150 hover:bg-gray-300 dark:bg-dark-900 dark:text-white dark:hover:bg-gray-700"
                   >
                     Batal
                   </button>

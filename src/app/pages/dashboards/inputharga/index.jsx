@@ -3,7 +3,7 @@ import HargaBapokTable from "./tableBapok";
 
 export default function inputharga() {
   return (
-    <Page title="inputharga">
+    <Page title="Input Harga">
       
             {/* import <tableBapok/> masukkan di sini  */}
             <HargaBapokTable/>
