@@ -317,7 +317,7 @@ export default function Petugas() {
         key="prev"
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="mx-1 rounded border border-gray-600 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-700 dark:text-gray-100"
+        className="mx-1 rounded border border-gray-600 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-dark-900 dark:text-gray-100"
       >
         ‹
       </button>,
@@ -332,7 +332,7 @@ export default function Petugas() {
           className={`mx-1 rounded border px-3 py-2 text-sm font-medium ${
             currentPage === i
               ? "border-blue-600 bg-blue-600 text-white"
-              : "border-gray-600 bg-gray-50 text-gray-900 hover:bg-gray-600 dark:bg-gray-700 dark:text-gray-100"
+              : "border-gray-600 bg-gray-50 text-gray-900 hover:bg-gray-600 dark:bg-dark-900 dark:text-gray-100"
           }`}
         >
           {i}
@@ -346,7 +346,7 @@ export default function Petugas() {
         key="next"
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="mx-1 rounded border border-gray-600 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-700 dark:text-gray-100"
+        className="mx-1 rounded border border-gray-600 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-dark-900 dark:text-gray-100"
       >
         ›
       </button>,
@@ -391,7 +391,7 @@ export default function Petugas() {
               <select
                 value={itemsPerPage}
                 onChange={handleItemsPerPageChange}
-                className="rounded border border-gray-300 bg-white px-3 py-1 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                className="rounded border border-gray-300 bg-white px-3 py-1 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-dark-900 dark:text-gray-100"
               >
                 <option value={5}>5</option>
                 <option value={10}>10</option>
@@ -494,9 +494,9 @@ export default function Petugas() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white shadow-2xl dark:bg-gray-800">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white shadow-2xl dark:bg-dark-900">
             {/* Modal Header */}
-            <div className="rounded-t-xl border-b border-gray-200 bg-gray-50 px-6 py-4 dark:border-gray-600 dark:bg-gray-700">
+            <div className="rounded-t-xl border-b border-gray-200 bg-gray-50 px-6 py-4 dark:border-gray-600 dark:bg-dark-900">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                   {isEditMode ? "Edit Petugas" : "Tambah Petugas Baru"}
@@ -533,7 +533,7 @@ export default function Petugas() {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-dark-900 dark:text-gray-100"
                   placeholder="Masukkan nama petugas"
                   required
                 />
@@ -549,7 +549,7 @@ export default function Petugas() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-dark-900 dark:text-gray-100"
                   placeholder="Masukkan email petugas"
                   required
                 />
@@ -565,7 +565,7 @@ export default function Petugas() {
                   name="no_telepon"
                   value={formData.no_telepon}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-dark-900 dark:text-gray-100"
                   placeholder="Masukkan nomor telepon (contoh: 081234567890)"
                   required
                   pattern="^08[0-9]{8,12}$"
@@ -581,7 +581,7 @@ export default function Petugas() {
                   name="id_pasar"
                   value={formData.id_pasar}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-dark-900 dark:text-gray-100"
                 >
                   <option value="">-- Pilih Pasar --</option>
                   {daftarPasar.map((pasar) => (
@@ -604,7 +604,7 @@ export default function Petugas() {
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-dark-900 dark:text-gray-100"
                       placeholder="Masukkan password"
                       required
                     />
@@ -620,7 +620,7 @@ export default function Petugas() {
                       name="password_confirmation"
                       value={formData.password_confirmation}
                       onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-dark-900 dark:text-gray-100"
                       placeholder="Konfirmasi password"
                       required
                     />
@@ -633,7 +633,7 @@ export default function Petugas() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="rounded-lg bg-gray-200 px-4 py-2 text-sm font-medium text-gray-800 transition-colors duration-150 hover:bg-gray-300 focus:ring-2 focus:ring-gray-500 focus:outline-none dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700"
+                  className="rounded-lg bg-gray-200 px-4 py-2 text-sm font-medium text-gray-800 transition-colors duration-150 hover:bg-gray-300 focus:ring-2 focus:ring-gray-500 focus:outline-none dark:bg-dark-900 dark:text-white dark:hover:bg-gray-700"
                 >
                   Batal
                 </button>

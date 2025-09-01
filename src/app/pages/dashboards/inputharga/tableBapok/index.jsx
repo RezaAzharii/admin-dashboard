@@ -372,7 +372,7 @@ const [stokError, setStokError] = useState("");
         key="prev"
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="mx-1 rounded border border-gray-600 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-700"
+        className="mx-1 rounded border border-gray-600 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-dark-900"
       >
         ‹
       </button>,
@@ -387,7 +387,7 @@ const [stokError, setStokError] = useState("");
           className={`mx-1 rounded border px-3 py-2 text-sm font-medium ${
             currentPage === i
               ? "border-blue-600 bg-blue-600 text-white"
-              : "border-gray-600 bg-gray-50 text-gray-900 hover:bg-gray-600 dark:bg-gray-700 dark:text-gray-100"
+              : "border-gray-600 bg-gray-50 text-gray-900 hover:bg-gray-600 dark:bg-dark-900 dark:text-gray-100"
           }`}
         >
           {i}
@@ -401,7 +401,7 @@ const [stokError, setStokError] = useState("");
         key="next"
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="mx-1 rounded border border-gray-600 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-700 dark:text-gray-100"
+        className="mx-1 rounded border border-gray-600 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-dark-900 dark:text-gray-100"
       >
         ›
       </button>,
@@ -453,7 +453,7 @@ const [stokError, setStokError] = useState("");
         <select
           value={itemsPerPage}
           onChange={handleItemsPerPageChange}
-          className="dark:text-dark-50 rounded border border-gray-600 bg-gray-50 px-3 py-1 text-gray-800 focus:border-blue-500 focus:outline-none dark:bg-gray-700"
+          className="dark:text-dark-50 rounded border border-gray-600 bg-gray-50 px-3 py-1 text-gray-800 focus:border-blue-500 focus:outline-none dark:bg-dark-900"
         >
           <option value={5}>5</option>
           <option value={10}>10</option>
@@ -465,7 +465,7 @@ const [stokError, setStokError] = useState("");
         </span>
       </div>
 
-      <div className="overflow-x-auto rounded-lg bg-white shadow-xl dark:bg-gray-800">
+      <div className="overflow-x-auto rounded-lg bg-white shadow-xl dark:bg-dark-900">
         <table className="min-w-full border border-gray-200  dark:border-gray-700">
           <thead className="bg-gray-50 dark:bg-dark-900 border-gray-200 dark:border-gray-700">
             <tr>
@@ -564,7 +564,7 @@ const [stokError, setStokError] = useState("");
                           ? "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200"
                           : item.status_integrasi === "pending"
                             ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200"
-                            : "bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300"
+                            : "bg-gray-100 text-gray-800 dark:bg-dark-900 dark:text-gray-300"
                       }`}
                     >
                       {item.status_integrasi === "approve"
@@ -619,9 +619,9 @@ const [stokError, setStokError] = useState("");
       {/* Enhanced Modal Tambah/Edit */}
       {showModal && (
         <div className="bg-opacity-75 fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white shadow-2xl dark:bg-gray-800">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white shadow-2xl dark:bg-dark-900">
             {/* Modal Header */}
-            <div className="rounded-t-xl border-b border-gray-200 bg-gray-50 px-6 py-4 dark:border-gray-600 dark:bg-gray-700">
+            <div className="rounded-t-xl border-b border-gray-200 bg-gray-50 px-6 py-4 dark:border-gray-600 dark:bg-dark-900">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                   {modalType === "add"
@@ -661,7 +661,7 @@ const [stokError, setStokError] = useState("");
                     name="id_pasar"
                     value={formData.id_pasar}
                     onChange={handleChange}
-                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-dark-900 dark:text-gray-100"
                     required
                     disabled={currentUser?.is_petugas_pasar}
                   >
@@ -686,7 +686,7 @@ const [stokError, setStokError] = useState("");
                     name="id_bahan_pokok"
                     value={formData.id_bahan_pokok}
                     onChange={handleChange}
-                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-dark-900 dark:text-gray-100"
                     required
                   >
                     <option value="">Pilih Bahan Pokok</option>
@@ -709,7 +709,7 @@ const [stokError, setStokError] = useState("");
                   name="tanggal"
                   value={formData.tanggal}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-dark-900 dark:text-gray-100"
                   required
                   max={new Date().toISOString().split("T")[0]}
                 />
@@ -740,7 +740,7 @@ const [stokError, setStokError] = useState("");
                         }));
                       }
                     }}
-                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-dark-900 dark:text-gray-100"
                     placeholder="Masukkan harga"
                     required
                   />
@@ -771,7 +771,7 @@ const [stokError, setStokError] = useState("");
                         }));
                       }
                     }}
-                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 transition-all duration-150 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-dark-900 dark:text-gray-100"
                     placeholder="0"
                     required
                   />
@@ -786,7 +786,7 @@ const [stokError, setStokError] = useState("");
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="rounded-lg bg-gray-500 px-4 py-2 font-medium text-white transition-colors duration-150 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700"
+                  className="rounded-lg bg-gray-500 px-4 py-2 font-medium text-white transition-colors duration-150 hover:bg-gray-600 dark:bg-dark-900 dark:hover:bg-gray-700"
                 >
                   Batal
                 </button>
