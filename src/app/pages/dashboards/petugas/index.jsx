@@ -12,9 +12,9 @@ export default function Petugas() {
   const [entriesPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [reloadTrigger, setReloadTrigger] = useState(false); // State untuk trigger reload
+  const [reloadTrigger, setReloadTrigger] = useState(false);   
 
-  // Modal state
+    
   const [showModal, setShowModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [formData, setFormData] = useState({
@@ -31,7 +31,7 @@ export default function Petugas() {
 
   const [daftarPasar, setDaftarPasar] = useState([]);
 
-  // Function to fetch market data
+    
   const fetchPasar = async () => {
     try {
       const token = getAuthToken();
@@ -49,7 +49,7 @@ export default function Petugas() {
     }
   };
 
-  // Function to fetch user data
+    
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -100,7 +100,7 @@ export default function Petugas() {
   useEffect(() => {
     fetchUsers();
     fetchPasar();
-  }, [reloadTrigger]); // Tambahkan reloadTrigger sebagai dependency
+  }, [reloadTrigger]);   
 
   const openAddModal = () => {
     setIsEditMode(false);
@@ -161,7 +161,7 @@ export default function Petugas() {
       return;
     }
 
-    // Validate phone number format
+      
     const phoneRegex = /^08[0-9]{8,12}$/;
     if (!phoneRegex.test(formData.no_telepon)) {
       MySwal.fire(
@@ -187,7 +187,7 @@ export default function Petugas() {
             name: formData.name,
             email: formData.email,
             id_pasar: formData.id_pasar,
-            no_telepon: formData.no_telepon, // Include phone number
+            no_telepon: formData.no_telepon,   
           },
           { headers: { Authorization: `Bearer ${token}` } },
         );
@@ -200,7 +200,7 @@ export default function Petugas() {
                   name: formData.name,
                   email: formData.email,
                   id_pasar: formData.id_pasar,
-                  no_telepon: formData.no_telepon, // Update phone number
+                  no_telepon: formData.no_telepon,   
                   nama_pasar:
                     daftarPasar.find((p) => p.id === formData.id_pasar)?.nama ||
                     "-",
@@ -220,7 +220,7 @@ export default function Petugas() {
             password_confirmation: formData.password_confirmation,
             is_petugas_pasar: true,
             id_pasar: formData.id_pasar,
-            no_telepon: formData.no_telepon, // Include phone number
+            no_telepon: formData.no_telepon,   
           },
           { headers: { Authorization: `Bearer ${token}` } },
         );
@@ -232,7 +232,7 @@ export default function Petugas() {
             email: formData.email,
             is_petugas_pasar: true,
             id_pasar: formData.id_pasar,
-            no_telepon: formData.no_telepon, // Include phone number
+            no_telepon: formData.no_telepon,   
             nama_pasar:
               daftarPasar.find((p) => p.id === formData.id_pasar)?.nama || "-",
           },
@@ -273,9 +273,9 @@ export default function Petugas() {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        // Optimalkan penghapusan data dengan functional update
+          
         setData((prevData) => prevData.filter((user) => user.user_id !== id));
-        setReloadTrigger((prev) => !prev); // Trigger reload setelah penghapusan
+        setReloadTrigger((prev) => !prev);   
         MySwal.fire("Terhapus!", "Data berhasil dihapus.", "success");
       } catch (error) {
         console.error(error);
@@ -285,7 +285,7 @@ export default function Petugas() {
     }
   };
 
-  // Pagination logic
+    
   const totalPages = Math.ceil(data.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -311,7 +311,7 @@ export default function Petugas() {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
 
-    // Previous button
+      
     buttons.push(
       <button
         key="prev"
@@ -323,7 +323,7 @@ export default function Petugas() {
       </button>,
     );
 
-    // Page numbers
+      
     for (let i = startPage; i <= endPage; i++) {
       buttons.push(
         <button
@@ -340,7 +340,7 @@ export default function Petugas() {
       );
     }
 
-    // Next button
+      
     buttons.push(
       <button
         key="next"

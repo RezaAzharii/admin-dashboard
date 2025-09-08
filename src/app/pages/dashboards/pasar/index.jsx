@@ -639,13 +639,13 @@ const Pasar = () => {
   const [showForm, setShowForm] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
 
-  // Pagination states
+   
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10); // Default to 10 items per page
+  const [itemsPerPage, setItemsPerPage] = useState(10);  
 
   useEffect(() => {
     loadPasars();
-  }, []); // Initial load
+  }, []);  
 
   const loadPasars = async () => {
     try {
@@ -785,7 +785,7 @@ const Pasar = () => {
     setIsEdit(false);
   };
 
-  // Pagination Logic
+   
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentPasars = pasars.slice(indexOfFirstItem, indexOfLastItem);
@@ -797,7 +797,7 @@ const Pasar = () => {
 
   const handleItemsPerPageChange = (e) => {
     setItemsPerPage(Number(e.target.value));
-    setCurrentPage(1); // Reset to first page when items per page changes
+    setCurrentPage(1);  
   };
 
 

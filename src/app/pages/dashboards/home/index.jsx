@@ -1,8 +1,8 @@
-// src/app/pages/dashboards/home/index.jsx
+  
 
 import { useState, useEffect } from "react";
 import { Page } from "components/shared/Page";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";   
 import { fetchDashboardData } from "app/services/dashboardService";
 import { DashboardHeader } from "./components/DashboardHeader";
 import { StatCards } from "./components/StatCards";
@@ -10,9 +10,12 @@ import { AlertsSection } from "./components/AlertsSection";
 import { LatestPrices } from "./components/LatestPrices";
 import { PriceChart } from "./components/PriceChart";
 import { RecentUpdates } from "./components/RecentUpdates";
+import { subscribeToDataUpdates } from "../../../services/utils/dashboardEvents";
+
 
 export default function Home() {
   const [currentTime, setCurrentTime] = useState(new Date());
+  
 
   useEffect(() => {
     document.title = "Beranda";
@@ -30,28 +33,41 @@ export default function Home() {
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["dashboardData"],
     queryFn: fetchDashboardData,
-    staleTime: 60 * 1000,
+    staleTime: 10 * 1000,
     refetchOnWindowFocus: true,
+    refetchInterval: 10000,
   });
 
-  // Log data yang berhasil diambil untuk debugging
+
+  
+  useEffect(() => {
+    const unsubscribe = subscribeToDataUpdates(() => {
+      // console.log("Data update triggered, refetching...");
+      refetch();
+    });
+
+    return unsubscribe;
+  }, [refetch]);
+
+  
   useEffect(() => {
     if (dashboardData) {
-      console.log("Data Dashboard Berhasil Dimuat: ✅");
-      console.log("-----------------------------------");
-      console.log("Harga Bahan Pokok:", dashboardData.hargaBapok);
-      console.log("Bahan Pokok:", dashboardData.bahanPokok);
-      console.log("Pasar:", dashboardData.pasar);
-      console.log("Petugas:", dashboardData.petugas);
-      console.log("Statistik:", dashboardData.stats);
-      console.log("-----------------------------------");
+      // console.log("Data Dashboard Berhasil Dimuat: ✅");
+      // console.log("-----------------------------------");
+      // console.log("Harga Bahan Pokok:", dashboardData.hargaBapok);
+      // console.log("Bahan Pokok:", dashboardData.bahanPokok);
+      // console.log("Pasar:", dashboardData.pasar);
+      // console.log("Petugas:", dashboardData.petugas);
+      // console.log("Statistik:", dashboardData.stats);
+      // console.log("-----------------------------------");
     }
   }, [dashboardData]);
 
-  // Fungsi untuk mendapatkan harga terbaru per bahan pokok
+    
   const getLatestPrices = () => {
     const latestPrices = {};
     if (!dashboardData?.hargaBapok || !dashboardData?.bahanPokok) return [];
@@ -78,7 +94,7 @@ export default function Home() {
     return Object.values(latestPrices).slice(0, 5);
   };
 
-  // Fungsi untuk mendapatkan update terbaru
+  
   const getRecentUpdates = () => {
     if (!dashboardData?.hargaBapok) return [];
 
@@ -108,7 +124,7 @@ export default function Home() {
       });
   };
 
-  // Fungsi untuk generate chart data
+  
   const getChartData = () => {
     const monthlyData = {};
     if (!dashboardData?.hargaBapok) return [];
@@ -136,14 +152,14 @@ export default function Home() {
       .slice(-6);
   };
 
-  // Generate alerts berdasarkan data real
+  
   const generateAlerts = () => {
     const alerts = [];
     if (!dashboardData) return alerts;
 
     const latestPrices = getLatestPrices();
 
-    // Alert for high prices
+    
     const expensiveItems = latestPrices.filter(
       (item) => parseInt(item.harga) > 50000,
     );
@@ -154,7 +170,7 @@ export default function Home() {
       });
     }
 
-    // Alert for officers who have not updated
+    
     const today = new Date().toISOString().split("T")[0];
     const petugasUpdate = new Set(
       dashboardData.hargaBapok
@@ -173,7 +189,7 @@ export default function Home() {
       });
     }
 
-    // Alert for data status
+    
     if (dashboardData.stats?.updateHariIni > 0) {
       alerts.push({
         type: "success",

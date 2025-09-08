@@ -54,24 +54,24 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const init = async () => {
-      console.log("🔄 AuthProvider init running...");
+      // console.log("🔄 AuthProvider init running...");
 
       try {
         const authToken = localStorage.getItem("authToken");
-        console.log("🧩 Auth token from localStorage:", authToken);
+        // console.log("🧩 Auth token from localStorage:", authToken);
 
         if (authToken) {
           setSession(authToken);
-          console.log("📡 Fetching /user/me from API with token...");
+          // console.log("📡 Fetching /user/me from API with token...");
 
           const response = await axios.get("/user/me");
-          console.log("✅ Full /user response:", response.data);
+          // console.log("✅ Full /user response:", response.data);
 
           // Ambil data user dari response.data.data
           const user = response.data?.data;
 
           if (isObject(user)) {
-            console.log("✅ Loaded user data:", user);
+            // console.log("✅ Loaded user data:", user);
             dispatch({
               type: "INITIALIZE",
               payload: { isAuthenticated: true, user },
@@ -86,7 +86,7 @@ export function AuthProvider({ children }) {
             });
           }
         } else {
-          console.log("❌ No auth token found → user is not authenticated");
+          // console.log("❌ No auth token found → user is not authenticated");
           dispatch({
             type: "INITIALIZE",
             payload: { isAuthenticated: false, user: null },
@@ -110,9 +110,9 @@ export function AuthProvider({ children }) {
   const login = async ({ email, password }) => {
     dispatch({ type: "LOGIN_REQUEST" });
     try {
-      console.log("🔑 Attempting login...");
+      // console.log("🔑 Attempting login...");
       const response = await axios.post("/login", { email, password });
-      console.log("✅ Login response:", response.data);
+      // console.log("✅ Login response:", response.data);
 
       const { access_token, user } = response.data;
 
@@ -122,7 +122,7 @@ export function AuthProvider({ children }) {
 
       setSession(access_token);
       localStorage.setItem("authToken", access_token);
-      console.log("📝 Token saved to localStorage:", access_token);
+      // console.log("📝 Token saved to localStorage:", access_token);
 
       dispatch({ type: "LOGIN_SUCCESS", payload: { user } });
     } catch (err) {
@@ -136,7 +136,7 @@ export function AuthProvider({ children }) {
 
   // --- Fungsi logout ---
   const logout = () => {
-    console.log("🚪 Logging out...");
+    // console.log("🚪 Logging out...");
     setSession(null);
     localStorage.removeItem("authToken");
     dispatch({ type: "LOGOUT" });
@@ -145,7 +145,7 @@ export function AuthProvider({ children }) {
 
   // --- Saat init belum selesai, tampilkan loading/null ---
   if (!state.isInitialized) {
-    console.log("⏳ Waiting for init...");
+    // console.log("⏳ Waiting for init...");
     return null; // Atau <LoadingScreen /> agar UX lebih baik
   }
 
