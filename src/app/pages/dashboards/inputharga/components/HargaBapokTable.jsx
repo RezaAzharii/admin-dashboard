@@ -2,6 +2,7 @@
 import { useState, useContext } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import Swal from "sweetalert2";
 import AuthContext from "app/contexts/auth/authContext";
 import API from "configs/api.config";
 
@@ -11,13 +12,15 @@ import HargaBapokTableBody from "./HargaBapokTableBody";
 import HargaBapokModal from "./HargaBapokModal";
 
 const fetchHargaBapokData = async ({ queryKey }) => {
-  const [, selectedDate, currentUser] = queryKey;
+  const [, selectedDate, selectedPasar, currentUser] = queryKey;
   const token = localStorage.getItem("authToken");
 
   let url = API.HARGA_BAPOK.INDEX;
   const params = { tanggal: selectedDate };
 
-  if (currentUser?.is_petugas_pasar && currentUser.id_pasar) {
+  if (selectedPasar) {
+    params.id_pasar = selectedPasar;
+  } else if (currentUser?.is_petugas_pasar && currentUser.id_pasar) {
     params.id_pasar = currentUser.id_pasar;
   }
 
@@ -62,6 +65,7 @@ export default function HargaBapokTable() {
     stok: "",
     status_integrasi: "pending",
   });
+  const [selectedPasar, setSelectedPasar] = useState("");
 
   
   const {
@@ -71,7 +75,7 @@ export default function HargaBapokTable() {
     error,
     refetch,
   } = useQuery({
-    queryKey: ["hargaBapok", selectedDate, currentUser],
+    queryKey: ["hargaBapok", selectedDate, selectedPasar, currentUser],
     queryFn: fetchHargaBapokData,
     enabled: !!currentUser, 
   });
@@ -129,6 +133,40 @@ export default function HargaBapokTable() {
     refetch(); 
   };
 
+  const handleApproveAll = async () => {
+    const pendingItems = dataHarga?.filter(item => item.status_integrasi === 'pending') || [];
+    if (pendingItems.length === 0) return;
+
+    const token = localStorage.getItem("authToken");
+
+    try {
+      Swal.fire({
+        title: "Menyetujui semua data...",
+        text: "Mohon tunggu sebentar",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      await Promise.all(
+        pendingItems.map((item) =>
+          axios.put(
+            API.HARGA_BAPOK.UPDATE(item.id),
+            { ...item, status_integrasi: "approve" },
+            { headers: { Authorization: `Bearer ${token}` } }
+          )
+        )
+      );
+      
+      await refetch();
+      Swal.fire("Berhasil!", "Semua data yang dipilih telah disetujui.", "success");
+    } catch (error) {
+      console.error("Failed to approve all items:", error);
+      Swal.fire("Gagal!", "Gagal menyetujui beberapa data. Silakan coba lagi.", "error");
+    }
+  };
+
   if (isLoading || isDependenciesLoading) {
     return (
       <div className="flex items-center justify-center py-12 text-white">
@@ -151,7 +189,13 @@ export default function HargaBapokTable() {
       <TableFilters
         selectedDate={selectedDate}
         setSelectedDate={setSelectedDate}
+        selectedPasar={selectedPasar}
+        setSelectedPasar={setSelectedPasar}
+        listPasar={dependencies?.listPasar || []}
         onAddClick={handleAddClick}
+        onApproveAll={currentUser?.is_admin ? handleApproveAll : null}
+        hasPendingItems={dataHarga?.some(item => item.status_integrasi === 'pending')}
+        currentUser={currentUser}
       />
       
       <HargaBapokTableBody

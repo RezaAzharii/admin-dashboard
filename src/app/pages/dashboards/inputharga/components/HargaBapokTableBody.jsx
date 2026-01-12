@@ -28,6 +28,24 @@ const HargaBapokTableBody = ({ data, onEditClick, currentUser }) => {
     },
   });
 
+  const unapproveMutation = useMutation({
+    mutationFn: async (id) => {
+      const token = localStorage.getItem("authToken");
+      const selectedItem = data.find((item) => item.id === id);
+      const payload = { ...selectedItem, status_integrasi: "pending" };
+      await axios.put(API.HARGA_BAPOK.UPDATE(id), payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    },
+    onSuccess: () => {
+      Swal.fire("Berhasil!", "Status telah dikembalikan ke pending.", "success");
+      queryClient.invalidateQueries({ queryKey: ["hargaBapok"] });
+    },
+    onError: (err) => {
+      Swal.fire("Gagal!", `Terjadi kesalahan: ${err.message}`, "error");
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
       const token = localStorage.getItem("authToken");
@@ -55,6 +73,21 @@ const HargaBapokTableBody = ({ data, onEditClick, currentUser }) => {
     }).then((result) => {
       if (result.isConfirmed) {
         approveMutation.mutate(id);
+      }
+    });
+  };
+
+  const handleUnapproveClick = (id) => {
+    Swal.fire({
+      title: "Batal Setujui?",
+      text: "Apakah Anda yakin ingin membatalkan persetujuan data ini? Status akan kembali menjadi pending.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, Batalkan",
+      cancelButtonText: "Tutup",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        unapproveMutation.mutate(id);
       }
     });
   };
@@ -209,6 +242,9 @@ const HargaBapokTableBody = ({ data, onEditClick, currentUser }) => {
                   <div className="flex space-x-2">
                     {item.status_integrasi === "pending" && !currentUser?.is_petugas_pasar && (
                       <button onClick={() => handleApproveClick(item.id)} className="inline-flex h-8 items-center justify-center rounded-lg bg-green-100 px-3 text-green-800 transition-all duration-200 hover:bg-green-200 dark:bg-green-600/20 dark:text-green-400 dark:hover:bg-green-600/30 dark:hover:text-green-300">Setujui</button>
+                    )}
+                    {item.status_integrasi === "approve" && !currentUser?.is_petugas_pasar && (
+                      <button onClick={() => handleUnapproveClick(item.id)} className="inline-flex h-8 items-center justify-center rounded-lg bg-gray-100 px-3 text-gray-800 transition-all duration-200 hover:bg-gray-200 dark:bg-gray-600/20 dark:text-gray-400 dark:hover:bg-gray-600/30 dark:hover:text-gray-300">Batal Setujui</button>
                     )}
                     <button onClick={() => onEditClick(item)} className="inline-flex h-8 items-center justify-center rounded-lg bg-yellow-100 px-3 text-yellow-800 transition-all duration-200 hover:bg-yellow-200 dark:bg-yellow-600/20 dark:text-yellow-300 dark:hover:bg-yellow-600/30 dark:hover:text-yellow-300">Edit</button>
                     <button onClick={() => handleDeleteClick(item.id)} className="inline-flex h-8 items-center justify-center rounded-lg bg-red-100 px-3 text-red-800 transition-all duration-200 hover:bg-red-200 dark:bg-red-600/20 dark:text-red-300 dark:hover:bg-red-600/30 dark:hover:text-red-300">Hapus</button>
